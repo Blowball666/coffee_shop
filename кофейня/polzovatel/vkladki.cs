@@ -1,5 +1,4 @@
-﻿
-namespace кофейня.polzovatel
+﻿namespace кофейня.polzovatel
 {
     public partial class vkladki : Form
     {
@@ -13,6 +12,9 @@ namespace кофейня.polzovatel
             this.previousForm = previousForm;
             this.StartPosition = FormStartPosition.Manual;
             this.Location = new Point(125, 70);
+
+            // Подписка на событие закрытия предыдущей формы
+            this.previousForm.FormClosed += (s, args) => this.Close();
         }
 
         private void OpenAndClose(Form newForm)
@@ -33,7 +35,7 @@ namespace кофейня.polzovatel
 
         private void label4_Click(object sender, EventArgs e)
         {
-            menu form2 = new menu(userId);
+            menu form2 = new menu(userId, 2);
             OpenAndClose(form2);
         }
 

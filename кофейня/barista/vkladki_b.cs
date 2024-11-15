@@ -1,13 +1,15 @@
-﻿namespace кофейня.admin
+﻿namespace кофейня.barista
 {
-    public partial class vkladki_a : Form
+    public partial class vkladki_b : Form
     {
+        private int userId;
         private Form previousForm;
 
-        public vkladki_a(Form previousForm)
+        public vkladki_b(Form previousForm, int userId)
         {
             InitializeComponent();
             this.previousForm = previousForm;
+            this.userId = userId;
             this.StartPosition = FormStartPosition.Manual;
             this.Location = new Point(105, 50);
 
@@ -24,8 +26,7 @@
             this.previousForm.Hide();
             this.Hide();
         }
-
-        private void label3_Click(object sender, EventArgs e)
+        private void label2_Click(object sender, EventArgs e)
         {
             vhod vhodForm = new vhod();
             OpenAndClose(vhodForm);
@@ -33,14 +34,8 @@
 
         private void label1_Click(object sender, EventArgs e)
         {
-            admin_menu form1 = new admin_menu();
+            barista_zakaz form1 = new barista_zakaz(userId);
             OpenAndClose(form1);
-        }
-
-        private void label2_Click(object sender, EventArgs e)
-        {
-            upr_barista form2 = new upr_barista();
-            OpenAndClose(form2);
         }
     }
 }
