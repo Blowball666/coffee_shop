@@ -20,10 +20,6 @@ namespace кофейня
             textBox1.PasswordChar = '*';
             textBox1.Text = "Пароль";
             textBox1.PasswordChar = '\0';
-
-            // Обработчики событий KeyDown для перемещения фокуса
-            maskedTextBox1.KeyDown += maskedTextBox1_KeyDown;
-            textBox1.KeyDown += textBox1_KeyDown;
         }
 
         private void maskedTextBox1_KeyDown(object sender, KeyEventArgs e)
@@ -136,7 +132,7 @@ namespace кофейня
                 case 2:
                 case 3:
                 default:
-                    formToOpen = new menu(user_id);
+                    formToOpen = new menu(user_id, userRoleId);
                     break;
             }
 
@@ -201,5 +197,22 @@ namespace кофейня
                 textBox1.PasswordChar = '\0';
             }
         }
+        private void button3_Click(object sender, EventArgs e)
+        {
+            string guestEmail = "g@gmail.com";
+            string guestPassword = "000";
+
+            // Проверяем данные гостя
+            if (ValidateLogin(guestEmail, guestPassword))
+            {
+                user_email = guestEmail;
+                OpenMenuForm();
+            }
+            else
+            {
+                MessageBox.Show("Не удается войти как гость.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
     }
 }

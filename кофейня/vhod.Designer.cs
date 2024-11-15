@@ -37,6 +37,7 @@
             pictureBox1 = new PictureBox();
             label1 = new Label();
             textBox1 = new TextBox();
+            button3 = new Button();
             ((System.ComponentModel.ISupportInitialize)pictureBoxFon).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
@@ -56,7 +57,7 @@
             maskedTextBox1.BorderStyle = BorderStyle.None;
             maskedTextBox1.Font = new Font("Roboto", 20.25F, FontStyle.Bold);
             maskedTextBox1.ForeColor = Color.FromArgb(132, 154, 157);
-            maskedTextBox1.Location = new Point(487, 216);
+            maskedTextBox1.Location = new Point(487, 206);
             maskedTextBox1.Name = "maskedTextBox1";
             maskedTextBox1.Size = new Size(373, 36);
             maskedTextBox1.TabIndex = 18;
@@ -72,7 +73,7 @@
             button2.FlatStyle = FlatStyle.Flat;
             button2.ForeColor = Color.Transparent;
             button2.Image = (Image)resources.GetObject("button2.Image");
-            button2.Location = new Point(693, 400);
+            button2.Location = new Point(693, 375);
             button2.Name = "button2";
             button2.Size = new Size(187, 67);
             button2.TabIndex = 16;
@@ -86,7 +87,7 @@
             button1.FlatStyle = FlatStyle.Flat;
             button1.ForeColor = Color.Transparent;
             button1.Image = (Image)resources.GetObject("button1.Image");
-            button1.Location = new Point(470, 400);
+            button1.Location = new Point(470, 375);
             button1.Name = "button1";
             button1.Size = new Size(187, 67);
             button1.TabIndex = 15;
@@ -96,7 +97,7 @@
             // pictureBox2
             // 
             pictureBox2.Image = (Image)resources.GetObject("pictureBox2.Image");
-            pictureBox2.Location = new Point(470, 304);
+            pictureBox2.Location = new Point(470, 284);
             pictureBox2.Name = "pictureBox2";
             pictureBox2.Size = new Size(410, 66);
             pictureBox2.TabIndex = 14;
@@ -105,7 +106,7 @@
             // pictureBox1
             // 
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(470, 203);
+            pictureBox1.Location = new Point(470, 193);
             pictureBox1.Name = "pictureBox1";
             pictureBox1.Size = new Size(410, 66);
             pictureBox1.TabIndex = 13;
@@ -117,7 +118,7 @@
             label1.BackColor = Color.Transparent;
             label1.Font = new Font("Roboto", 44F);
             label1.ForeColor = Color.FromArgb(202, 57, 0);
-            label1.Location = new Point(586, 76);
+            label1.Location = new Point(586, 86);
             label1.Name = "label1";
             label1.Size = new Size(171, 78);
             label1.TabIndex = 12;
@@ -128,7 +129,7 @@
             textBox1.BorderStyle = BorderStyle.None;
             textBox1.Font = new Font("Roboto", 20.25F, FontStyle.Bold);
             textBox1.ForeColor = Color.FromArgb(132, 154, 157);
-            textBox1.Location = new Point(487, 318);
+            textBox1.Location = new Point(487, 298);
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(373, 36);
             textBox1.TabIndex = 19;
@@ -137,12 +138,27 @@
             textBox1.KeyDown += textBox1_KeyDown;
             textBox1.Leave += textBox1_Leave;
             // 
+            // button3
+            // 
+            button3.BackColor = Color.Transparent;
+            button3.BackgroundImageLayout = ImageLayout.None;
+            button3.FlatStyle = FlatStyle.Flat;
+            button3.ForeColor = Color.Transparent;
+            button3.Image = (Image)resources.GetObject("button3.Image");
+            button3.Location = new Point(568, 461);
+            button3.Name = "button3";
+            button3.Size = new Size(205, 42);
+            button3.TabIndex = 20;
+            button3.UseVisualStyleBackColor = false;
+            button3.Click += button3_Click;
+            // 
             // vhod
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
             ClientSize = new Size(1350, 621);
+            Controls.Add(button3);
             Controls.Add(textBox1);
             Controls.Add(maskedTextBox1);
             Controls.Add(button2);
@@ -173,5 +189,6 @@
         private PictureBox pictureBox1;
         private Label label1;
         private TextBox textBox1;
+        private Button button3;
     }
 }

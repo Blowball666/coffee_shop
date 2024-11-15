@@ -15,15 +15,39 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Resources\значки\выделить все.png" />
     <None Remove="Resources\значки\пуст_сердце.png" />
     <None Remove="Resources\значки\сердце.png" />
+    <None Remove="Resources\значки\снять выделение.png" />
+    <None Remove="Resources\значки\фото_не_найдено.png" />
+    <None Remove="Resources\кнопки\минус.png" />
+    <None Remove="Resources\кнопки\плюс.png" />
+    <None Remove="Resources\фото_корз.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Resources\значки\выделить все.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\значки\пуст_сердце.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\значки\сердце.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\значки\снять выделение.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\значки\фото_не_найдено.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\кнопки\минус.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\кнопки\плюс.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\фото_корз.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -36,6 +60,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="barista\vkladki_b.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

@@ -1,7 +1,9 @@
 using Npgsql;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+[assembly: InternalsVisibleTo("TestProjectCoffeeShop")]
 
 namespace кофейня
 {
@@ -20,15 +22,8 @@ namespace кофейня
 
             //настройка поля ввода пароля
             textBox1.Text = "Пароль";
-            textBox1.PasswordChar = '\0';
-
-            richTextBox1.KeyDown += richTextBox1_KeyDown;
-            maskedTextBox1.KeyDown += maskedTextBox1_KeyDown;
-            maskedTextBox2.KeyDown += maskedTextBox2_KeyDown;
-            maskedTextBox3.KeyDown += maskedTextBox3_KeyDown;
-            textBox1.KeyDown += textBox1_KeyDown;
+            textBox1.PasswordChar = '\0';            
         }
-
         // Обработчики событий KeyDown для перемещения фокуса на следующее поле ввода при нажатии Enter
         private void richTextBox1_KeyDown(object sender, KeyEventArgs e)
         {
@@ -38,7 +33,6 @@ namespace кофейня
                 maskedTextBox1.Focus();
             }
         }
-
         private void maskedTextBox1_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -47,7 +41,6 @@ namespace кофейня
                 maskedTextBox2.Focus();
             }
         }
-
         private void maskedTextBox2_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -56,7 +49,6 @@ namespace кофейня
                 maskedTextBox3.Focus();
             }
         }
-
         private void maskedTextBox3_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -65,7 +57,6 @@ namespace кофейня
                 textBox1.Focus();
             }
         }
-
         private void textBox1_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -74,65 +65,86 @@ namespace кофейня
                 button1.PerformClick();
             }
         }
-
         private void button1_Click(object sender, EventArgs e)
         {
-            string fullName = richTextBox1.Text;
+            var errorMessage = new StringBuilder();
+
+            // Проверка на наличие фамилии и имени
+            string fullName = richTextBox1.Text.Trim();
             string[] names = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
             string userLastname = names.Length > 0 ? names[0] : string.Empty;
             string userName = names.Length > 1 ? names[1] : string.Empty;
+
+            if (string.IsNullOrWhiteSpace(userLastname) || string.IsNullOrWhiteSpace(userName))
+            {
+                errorMessage.AppendLine("Введите фамилию и имя (через пробел).");
+            }
 
             string userEmail = maskedTextBox1.Text;
             string userPhone = maskedTextBox2.Text;
             string userBirthday = maskedTextBox3.Text;
             string userPassword = textBox1.Text;
 
-            if (DateTime.TryParse(userBirthday, out DateTime birthday))
+            if (string.IsNullOrWhiteSpace(userEmail) || string.IsNullOrWhiteSpace(userPhone) ||
+                string.IsNullOrWhiteSpace(userPassword) || userBirthday == "Дата рождения")
             {
-                if (string.IsNullOrWhiteSpace(userName) || string.IsNullOrWhiteSpace(userLastname) ||
-                    string.IsNullOrWhiteSpace(userEmail) || string.IsNullOrWhiteSpace(userPhone) ||
-                    string.IsNullOrWhiteSpace(userPassword))
-                {
-                    MessageBox.Show("Заполните все поля перед сохранением в базу данных.",
-                        "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
+                errorMessage.AppendLine("Заполните все поля перед сохранением в базу данных.");
+            }
 
-                if (!Regex.IsMatch(userEmail, @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"))
-                {
-                    MessageBox.Show("Некорректный email.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
+            // Проверка email
+            if (!Regex.IsMatch(userEmail, @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"))
+            {
+                errorMessage.AppendLine("Некорректный email.");
+            }
 
-                if (!Regex.IsMatch(userPhone, @"^8\(\d{3}\)\d{3}-\d{2}-\d{2}$"))
-                {
-                    MessageBox.Show("Некорректный номер телефона.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
+            // Проверка номера телефона
+            if (!Regex.IsMatch(userPhone, @"^8\(\d{3}\)\d{3}-\d{2}-\d{2}$"))
+            {
+                errorMessage.AppendLine("Некорректный номер телефона.");
+            }
 
-                // Получаем ID нового пользователя
-                int newUserId = SaveUserToDatabase(userName, userLastname, userEmail, userPhone, birthday, userPassword);
+            // Проверка на корректность даты рождения
+            if (!DateTime.TryParse(userBirthday, out DateTime birthday))
+            {
+                errorMessage.AppendLine("Введите правильно дату рождения.");
+            }
 
-                if (newUserId > 0)
-                {
-                    MessageBox.Show("Данные успешно сохранены!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);                    
-                    menu form2 = new menu(newUserId);
-                    this.Hide();
-                    form2.Closed += (s, args) => this.Close();
-                    form2.Show();
-                }
-                else
-                {
-                    MessageBox.Show("Произошла ошибка при сохранении данных в базу данных.",
-                        "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+            if (birthday > DateTime.Now)
+            {
+                errorMessage.AppendLine("Дата рождения не может быть в будущем.");
+            }
+
+            // Проверка пароля
+            if (userPassword.Length < 8 || !Regex.IsMatch(userPassword, @"^(?=.*[a-zA-Z])(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?!.*[А-Яа-яЁё]).{8,}$"))
+            {
+                errorMessage.AppendLine("Пароль должен содержать не менее 8 символов, включая цифры, строчные и заглавные латинские буквы.");
+            }
+
+            // Если есть ошибки
+            if (errorMessage.Length > 0)
+            {
+                MessageBox.Show(errorMessage.ToString(), "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Получаем ID нового пользователя
+            int newUserId = SaveUserToDatabase(userName, userLastname, userEmail, userPhone, birthday, userPassword);
+
+            if (newUserId > 0)
+            {
+                MessageBox.Show("Данные успешно сохранены!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                menu form2 = new menu(newUserId, 2);
+                this.Hide();
+                form2.Closed += (s, args) => this.Close();
+                form2.Show();
             }
             else
             {
-                MessageBox.Show("Введите правильно дату!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Произошла ошибка при сохранении данных в базу данных.",
+                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
         private int SaveUserToDatabase(string userName, string userLastname, string userEmail, string userPhone,
             DateTime userBirthday, string userPassword)
         {
@@ -183,9 +195,7 @@ namespace кофейня
                 }
             }
         }
-
-
-        private string HashPassword(string password) // хэширование пароля пользователя перед сохранением в БД
+        internal string HashPassword(string password) // хэширование пароля
         {
             using (SHA256 sha256 = SHA256.Create())
             {
@@ -193,7 +203,6 @@ namespace кофейня
                 return Convert.ToBase64String(hashedBytes);
             }
         }
-
         private void button2_Click(object sender, EventArgs e)
         {
             this.Hide();
@@ -201,7 +210,6 @@ namespace кофейня
             form1.Closed += (s, args) => this.Close();
             form1.Show();
         }
-
         private void richTextBox1_Enter(object sender, EventArgs e)
         {
             if (richTextBox1.Text == "Фамилия Имя")
@@ -209,7 +217,6 @@ namespace кофейня
                 richTextBox1.Clear();
             }
         }
-
         private void richTextBox1_Leave(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(richTextBox1.Text))
@@ -217,7 +224,6 @@ namespace кофейня
                 richTextBox1.Text = "Фамилия Имя";
             }
         }
-
         private void maskedTextBox1_Enter(object sender, EventArgs e)
         {
             if (maskedTextBox1.Text == "E-Mail")
@@ -225,7 +231,6 @@ namespace кофейня
                 maskedTextBox1.Clear();
             }
         }
-
         private void maskedTextBox1_Leave(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(maskedTextBox1.Text))
@@ -233,7 +238,6 @@ namespace кофейня
                 maskedTextBox1.Text = "E-Mail";
             }
         }
-
         private void textBox1_Enter(object sender, EventArgs e)
         {
             if (textBox1.Text == "Пароль")
@@ -242,7 +246,6 @@ namespace кофейня
                 textBox1.PasswordChar = '*';
             }
         }
-
         private void textBox1_Leave(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(textBox1.Text))
@@ -251,7 +254,6 @@ namespace кофейня
                 textBox1.PasswordChar = '\0';
             }
         }
-
         private void maskedTextBox2_Enter(object sender, EventArgs e)
         {
             if (maskedTextBox2.Text == "Телефон")

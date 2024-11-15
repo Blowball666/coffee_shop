@@ -1,6 +1,8 @@
 ﻿using System.Drawing.Drawing2D;
 using Npgsql;
-using System.Globalization;
+using System.Runtime.CompilerServices;
+[assembly: InternalsVisibleTo("TestProjectCoffeeShop")]
+
 
 namespace кофейня.polzovatel
 {
@@ -8,17 +10,21 @@ namespace кофейня.polzovatel
     {
         private int assortmentId;
         private int userId;
+        private int userRoleId;
+        private Form menuForm;
         private int quantity = 1;
         private decimal finalPrice;
         private string connectionString = "Host=172.20.7.6; Database=krezhowa_coffee; Username=st; Password=pwd";
 
-        public info(int assortmentId, int userId)
+        public info(int assortmentId, int userId, int userRoleId, Form menuForm)
         {
             InitializeComponent();
             this.StartPosition = FormStartPosition.Manual;
             this.Location = new Point(50, 50);
             this.assortmentId = assortmentId;
             this.userId = userId;
+            this.userRoleId = userRoleId;
+            this.menuForm = menuForm;
 
             LoadSizes();
             LoadSyrups();
@@ -36,12 +42,31 @@ namespace кофейня.polzovatel
             }
             this.FormClosing += Info_FormClosing;
         }
+
+        private void PromptForRegistration()
+        {
+            var result = MessageBox.Show(
+                "Для дальнейших действий необходимо зарегистрироваться или войти в аккаунт. Хотите продолжить?",
+                "Требуется регистрация",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Information
+            );
+
+            if (result == DialogResult.Yes)
+            {
+                registr registrForm = new registr();
+                registrForm.Show();
+                this.Hide();
+                menuForm.Hide();
+            }
+        }
+
         private void Info_FormClosing(object sender, FormClosingEventArgs e)
         {
             this.Hide();
             e.Cancel = true;
         }
-        private void LoadUserPoints()
+        internal void LoadUserPoints()
         {
             using (var connection = new NpgsqlConnection(connectionString))
             {
@@ -56,7 +81,7 @@ namespace кофейня.polzovatel
                 }
             }
         }
-        private void LoadSizes()
+        internal void LoadSizes()
         {
             using (var connection = new NpgsqlConnection(connectionString))
             {
@@ -118,7 +143,7 @@ namespace кофейня.polzovatel
             comboBox2.DisplayMember = "Name";
             comboBox2.ValueMember = "Id";
         }
-        private void LoadProductDetails()
+        internal void LoadProductDetails()
         {
             using (var conn = new NpgsqlConnection(connectionString))
             {
@@ -187,6 +212,11 @@ namespace кофейня.polzovatel
         }
         private void button2_Click(object sender, EventArgs e)
         {
+            if (userRoleId == 3) // Проверка, если пользователь - гость
+            {
+                PromptForRegistration();
+                return;
+            }
             // Логика для добавления/удаления из wishlist
             int wishlistId = ExecuteScalarQuery(
                 "SELECT id FROM Wishlist WHERE user_id = @userId",
@@ -266,7 +296,7 @@ namespace кофейня.polzovatel
                 }
             }
         }
-        private decimal CalculateFinalPrice(decimal basePrice)
+        internal decimal CalculateFinalPrice(decimal basePrice)
         {
             decimal syrupPrice = GetSyrupPrice();
             decimal sizePrice = GetSizePrice();
@@ -274,7 +304,7 @@ namespace кофейня.polzovatel
             decimal totalPrice = (basePrice + syrupPrice + sizePrice) * quantity * (1 + markup);
             return Math.Round(totalPrice, 2);
         }
-        private Image ResizeImage(Image image, int maxWidth, int maxHeight)
+        internal Image ResizeImage(Image image, int maxWidth, int maxHeight)
         {
             double ratioX = (double)maxWidth / image.Width;
             double ratioY = (double)maxHeight / image.Height;
@@ -295,7 +325,7 @@ namespace кофейня.polzovatel
         {
             UpdatePrice();
         }
-        private decimal GetBasePrice()
+        internal decimal GetBasePrice()
         {
             using (var connection = new NpgsqlConnection(connectionString))
             {
@@ -307,7 +337,7 @@ namespace кофейня.polzovatel
                 }
             }
         }
-        private decimal GetSyrupPrice()
+        internal decimal GetSyrupPrice()
         {
             if (comboBox2.SelectedItem != null)
             {
@@ -324,7 +354,7 @@ namespace кофейня.polzovatel
             }
             return 0;
         }
-        private decimal GetSizePrice()
+        internal decimal GetSizePrice()
         {
             if (comboBox1.SelectedItem != null)
             {
@@ -343,6 +373,11 @@ namespace кофейня.polzovatel
         }
         private void button3_Click(object sender, EventArgs e)
         {
+            if (userRoleId == 3) // Проверка, если пользователь - гость
+            {
+                PromptForRegistration();
+                return;
+            }
             using (var connection = new NpgsqlConnection(connectionString))
             {
                 connection.Open();
@@ -381,7 +416,7 @@ namespace кофейня.polzovatel
             }
             LoadUserPoints();
         }
-        private void UpdatePrice()
+        internal void UpdatePrice()
         {
             decimal basePrice = GetBasePrice();
             decimal syrupPrice = GetSyrupPrice();
@@ -458,6 +493,11 @@ namespace кофейня.polzovatel
         }
         private void button1_Click(object sender, EventArgs e)
         {
+            if (userRoleId == 3) // Проверка, если пользователь - гость
+            {
+                PromptForRegistration();
+                return;
+            }
             using (var connection = new NpgsqlConnection(connectionString))
             {
                 connection.Open();

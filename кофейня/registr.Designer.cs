@@ -257,12 +257,12 @@
         private PictureBox pictureBox3;
         private PictureBox pictureBox4;
         private PictureBox pictureBox5;
-        private Button button1;
+        internal Button button1;
         private Button button2;
-        private RichTextBox richTextBox1;
-        private MaskedTextBox maskedTextBox1;
-        private MaskedTextBox maskedTextBox2;
-        private MaskedTextBox maskedTextBox3;
-        private TextBox textBox1;
+        internal RichTextBox richTextBox1;
+        internal MaskedTextBox maskedTextBox1;
+        internal MaskedTextBox maskedTextBox2;
+        internal MaskedTextBox maskedTextBox3;
+        internal TextBox textBox1;
     }
 }

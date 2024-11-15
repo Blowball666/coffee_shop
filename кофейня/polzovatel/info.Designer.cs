@@ -2,6 +2,7 @@
 {
     partial class info
     {
+        [assembly: InternalsVisibleTo("TestProjectCoffeeShop")]
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -329,6 +330,8 @@
             Controls.Add(label7);
             Controls.Add(label10);
             Icon = (Icon)resources.GetObject("$this.Icon");
+            MaximumSize = new Size(816, 600);
+            MinimumSize = new Size(816, 600);
             Name = "info";
             Text = "Кофейня";
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
@@ -338,7 +341,7 @@
 
         #endregion
         private PictureBox pictureBox1;
-        private Label label3;
+        internal Label label3;
         private Label label2;
         private Label label1;
         private Button button2;
@@ -352,10 +355,10 @@
         private Button button5;
         private Label label7;
         private Label label8;
-        private Label label9;
+        internal Label label9;
         private CheckBox checkBox1;
         private Label label10;
         private Label label11;
-        private ComboBox comboBox1;
+        internal ComboBox comboBox1;
     }
 }
