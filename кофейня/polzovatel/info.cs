@@ -60,7 +60,6 @@ namespace кофейня.polzovatel
                 menuForm.Hide();
             }
         }
-
         private void Info_FormClosing(object sender, FormClosingEventArgs e)
         {
             this.Hide();

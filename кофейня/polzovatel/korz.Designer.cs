@@ -39,8 +39,9 @@
             label9 = new Label();
             button3 = new Button();
             button4 = new Button();
-            button5 = new Button();
             pictureBox1 = new PictureBox();
+            label2 = new Label();
+            label3 = new Label();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
@@ -115,6 +116,7 @@
             dataGridView1.TabStop = false;
             dataGridView1.CellContentClick += dataGridView1_CellContentClick;
             dataGridView1.CellFormatting += DataGridView1_CellFormatting;
+            dataGridView1.CellValueChanged += dataGridView1_CellValueChanged;
             // 
             // button2
             // 
@@ -128,18 +130,20 @@
             button2.Size = new Size(289, 74);
             button2.TabIndex = 72;
             button2.UseVisualStyleBackColor = false;
+            button2.Click += button2_Click;
             // 
             // checkBox1
             // 
             checkBox1.AutoSize = true;
             checkBox1.Font = new Font("Roboto", 18F);
             checkBox1.ForeColor = Color.FromArgb(202, 57, 0);
-            checkBox1.Location = new Point(631, 561);
+            checkBox1.Location = new Point(697, 536);
             checkBox1.Name = "checkBox1";
             checkBox1.Size = new Size(127, 36);
             checkBox1.TabIndex = 75;
             checkBox1.Text = "Списать";
             checkBox1.UseVisualStyleBackColor = true;
+            checkBox1.CheckedChanged += checkBox1_CheckedChanged;
             // 
             // label9
             // 
@@ -147,7 +151,7 @@
             label9.BackColor = Color.Transparent;
             label9.Font = new Font("Roboto", 18F);
             label9.ForeColor = Color.FromArgb(202, 57, 0);
-            label9.Location = new Point(390, 561);
+            label9.Location = new Point(415, 537);
             label9.Name = "label9";
             label9.Size = new Size(185, 32);
             label9.TabIndex = 74;
@@ -165,6 +169,7 @@
             button3.Size = new Size(357, 78);
             button3.TabIndex = 73;
             button3.UseVisualStyleBackColor = false;
+            button3.Click += button3_Click;
             // 
             // button4
             // 
@@ -173,24 +178,12 @@
             button4.FlatStyle = FlatStyle.Flat;
             button4.ForeColor = Color.Transparent;
             button4.Image = (Image)resources.GetObject("button4.Image");
-            button4.Location = new Point(283, 18);
+            button4.Location = new Point(351, 18);
             button4.Name = "button4";
             button4.Size = new Size(53, 56);
             button4.TabIndex = 76;
             button4.UseVisualStyleBackColor = false;
-            // 
-            // button5
-            // 
-            button5.BackColor = Color.Transparent;
-            button5.BackgroundImageLayout = ImageLayout.None;
-            button5.FlatStyle = FlatStyle.Flat;
-            button5.ForeColor = Color.Transparent;
-            button5.Image = (Image)resources.GetObject("button5.Image");
-            button5.Location = new Point(351, 18);
-            button5.Name = "button5";
-            button5.Size = new Size(53, 56);
-            button5.TabIndex = 77;
-            button5.UseVisualStyleBackColor = false;
+            button4.Click += button4_Click;
             // 
             // pictureBox1
             // 
@@ -202,14 +195,39 @@
             pictureBox1.TabIndex = 78;
             pictureBox1.TabStop = false;
             // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.BackColor = Color.Transparent;
+            label2.Font = new Font("Roboto", 18F);
+            label2.ForeColor = Color.FromArgb(202, 57, 0);
+            label2.Location = new Point(415, 581);
+            label2.Name = "label2";
+            label2.Size = new Size(238, 32);
+            label2.TabIndex = 79;
+            label2.Text = "Спишется ... баллов";
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.BackColor = Color.Transparent;
+            label3.Font = new Font("Roboto", 20F, FontStyle.Bold);
+            label3.ForeColor = Color.FromArgb(202, 57, 0);
+            label3.Location = new Point(12, 480);
+            label3.Name = "label3";
+            label3.Size = new Size(317, 35);
+            label3.TabIndex = 80;
+            label3.Text = "Итоговая стоимость: ...";
+            // 
             // korz
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
             ClientSize = new Size(1350, 621);
+            Controls.Add(label3);
+            Controls.Add(label2);
             Controls.Add(pictureBox1);
-            Controls.Add(button5);
             Controls.Add(button4);
             Controls.Add(checkBox1);
             Controls.Add(label9);
@@ -238,7 +256,8 @@
         internal Label label9;
         private Button button3;
         private Button button4;
-        private Button button5;
         private PictureBox pictureBox1;
+        internal Label label2;
+        internal Label label3;
     }
 }
