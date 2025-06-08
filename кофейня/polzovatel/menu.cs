@@ -327,6 +327,11 @@ namespace кофейня
 
         private void DataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
+            if (userRoleId == 3) // Проверка, если пользователь - гость
+            {
+                PromptForRegistration();
+                return;
+            }
             if (e.RowIndex >= 0 && (currentInfoForm == null || currentInfoForm.IsDisposed || !currentInfoForm.Visible))
             {
                 int assortmentId = (int)dataGridView1.Rows[e.RowIndex].Cells["id"].Value;
