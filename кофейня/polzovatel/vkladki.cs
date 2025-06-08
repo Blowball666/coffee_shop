@@ -50,5 +50,11 @@
             otl form4 = new otl(userId);
             OpenAndClose(form4);
         }
+
+        private void label5_Click(object sender, EventArgs e)
+        {
+            ist form5 = new ist(userId);
+            OpenAndClose(form5);
+        }
     }
 }

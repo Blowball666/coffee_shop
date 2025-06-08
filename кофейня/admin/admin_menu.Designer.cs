@@ -59,6 +59,11 @@
             label2 = new Label();
             label1 = new Label();
             label3 = new Label();
+            button12 = new Button();
+            button13 = new Button();
+            button14 = new Button();
+            dataGridView2 = new DataGridView();
+            label5 = new Label();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
@@ -66,6 +71,7 @@
             ((System.ComponentModel.ISupportInitialize)pictureBox4).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox5).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox6).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)dataGridView2).BeginInit();
             SuspendLayout();
             // 
             // dataGridView1
@@ -92,7 +98,7 @@
             textBox1.BorderStyle = BorderStyle.None;
             textBox1.Font = new Font("Roboto", 14F, FontStyle.Bold);
             textBox1.ForeColor = Color.FromArgb(132, 154, 157);
-            textBox1.Location = new Point(1008, 129);
+            textBox1.Location = new Point(1010, 138);
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(275, 25);
             textBox1.TabIndex = 24;
@@ -101,7 +107,7 @@
             // pictureBox2
             // 
             pictureBox2.Image = (Image)resources.GetObject("pictureBox2.Image");
-            pictureBox2.Location = new Point(995, 120);
+            pictureBox2.Location = new Point(997, 129);
             pictureBox2.Name = "pictureBox2";
             pictureBox2.Size = new Size(312, 47);
             pictureBox2.TabIndex = 25;
@@ -112,7 +118,7 @@
             textBox2.BorderStyle = BorderStyle.None;
             textBox2.Font = new Font("Roboto", 14F, FontStyle.Bold);
             textBox2.ForeColor = Color.FromArgb(132, 154, 157);
-            textBox2.Location = new Point(1008, 222);
+            textBox2.Location = new Point(1010, 231);
             textBox2.Name = "textBox2";
             textBox2.Size = new Size(275, 25);
             textBox2.TabIndex = 26;
@@ -121,7 +127,7 @@
             // pictureBox3
             // 
             pictureBox3.Image = (Image)resources.GetObject("pictureBox3.Image");
-            pictureBox3.Location = new Point(995, 213);
+            pictureBox3.Location = new Point(997, 222);
             pictureBox3.Name = "pictureBox3";
             pictureBox3.Size = new Size(312, 47);
             pictureBox3.TabIndex = 27;
@@ -132,7 +138,7 @@
             textBox3.BorderStyle = BorderStyle.None;
             textBox3.Font = new Font("Roboto", 14F, FontStyle.Bold);
             textBox3.ForeColor = Color.FromArgb(132, 154, 157);
-            textBox3.Location = new Point(1008, 314);
+            textBox3.Location = new Point(1010, 323);
             textBox3.Name = "textBox3";
             textBox3.Size = new Size(275, 25);
             textBox3.TabIndex = 28;
@@ -141,7 +147,7 @@
             // pictureBox4
             // 
             pictureBox4.Image = (Image)resources.GetObject("pictureBox4.Image");
-            pictureBox4.Location = new Point(995, 305);
+            pictureBox4.Location = new Point(997, 314);
             pictureBox4.Name = "pictureBox4";
             pictureBox4.Size = new Size(312, 47);
             pictureBox4.TabIndex = 29;
@@ -152,7 +158,7 @@
             checkBox1.AutoSize = true;
             checkBox1.Font = new Font("Roboto", 14F, FontStyle.Bold);
             checkBox1.ForeColor = Color.FromArgb(202, 57, 0);
-            checkBox1.Location = new Point(592, 425);
+            checkBox1.Location = new Point(978, 485);
             checkBox1.Name = "checkBox1";
             checkBox1.Size = new Size(119, 29);
             checkBox1.TabIndex = 48;
@@ -164,7 +170,7 @@
             checkBox2.AutoSize = true;
             checkBox2.Font = new Font("Roboto", 14F, FontStyle.Bold);
             checkBox2.ForeColor = Color.FromArgb(202, 57, 0);
-            checkBox2.Location = new Point(592, 464);
+            checkBox2.Location = new Point(978, 524);
             checkBox2.Name = "checkBox2";
             checkBox2.Size = new Size(341, 29);
             checkBox2.TabIndex = 49;
@@ -176,7 +182,7 @@
             checkBox3.AutoSize = true;
             checkBox3.Font = new Font("Roboto", 14F, FontStyle.Bold);
             checkBox3.ForeColor = Color.FromArgb(202, 57, 0);
-            checkBox3.Location = new Point(592, 505);
+            checkBox3.Location = new Point(978, 565);
             checkBox3.Name = "checkBox3";
             checkBox3.Size = new Size(354, 29);
             checkBox3.TabIndex = 50;
@@ -190,9 +196,9 @@
             button1.FlatStyle = FlatStyle.Flat;
             button1.ForeColor = Color.Transparent;
             button1.Image = (Image)resources.GetObject("button1.Image");
-            button1.Location = new Point(973, 386);
+            button1.Location = new Point(1227, 70);
             button1.Name = "button1";
-            button1.Size = new Size(365, 69);
+            button1.Size = new Size(40, 40);
             button1.TabIndex = 51;
             button1.UseVisualStyleBackColor = false;
             button1.Click += button1_Click;
@@ -204,9 +210,9 @@
             button2.FlatStyle = FlatStyle.Flat;
             button2.ForeColor = Color.Transparent;
             button2.Image = (Image)resources.GetObject("button2.Image");
-            button2.Location = new Point(973, 464);
+            button2.Location = new Point(1181, 70);
             button2.Name = "button2";
-            button2.Size = new Size(365, 69);
+            button2.Size = new Size(40, 40);
             button2.TabIndex = 52;
             button2.UseVisualStyleBackColor = false;
             button2.Click += button2_Click;
@@ -218,9 +224,9 @@
             button3.FlatStyle = FlatStyle.Flat;
             button3.ForeColor = Color.Transparent;
             button3.Image = (Image)resources.GetObject("button3.Image");
-            button3.Location = new Point(973, 542);
+            button3.Location = new Point(1273, 70);
             button3.Name = "button3";
-            button3.Size = new Size(365, 69);
+            button3.Size = new Size(40, 40);
             button3.TabIndex = 53;
             button3.UseVisualStyleBackColor = false;
             button3.Click += button3_Click;
@@ -232,7 +238,7 @@
             button4.FlatStyle = FlatStyle.Flat;
             button4.ForeColor = Color.Transparent;
             button4.Image = (Image)resources.GetObject("button4.Image");
-            button4.Location = new Point(565, 549);
+            button4.Location = new Point(951, 399);
             button4.Name = "button4";
             button4.Size = new Size(195, 63);
             button4.TabIndex = 54;
@@ -246,7 +252,7 @@
             button5.FlatStyle = FlatStyle.Flat;
             button5.ForeColor = Color.Transparent;
             button5.Image = (Image)resources.GetObject("button5.Image");
-            button5.Location = new Point(762, 549);
+            button5.Location = new Point(1148, 399);
             button5.Name = "button5";
             button5.Size = new Size(195, 63);
             button5.TabIndex = 55;
@@ -260,7 +266,7 @@
             button6.FlatStyle = FlatStyle.Flat;
             button6.ForeColor = Color.Transparent;
             button6.Image = (Image)resources.GetObject("button6.Image");
-            button6.Location = new Point(1228, -1);
+            button6.Location = new Point(1237, 0);
             button6.Name = "button6";
             button6.Size = new Size(80, 54);
             button6.TabIndex = 59;
@@ -288,7 +294,7 @@
             button7.FlatStyle = FlatStyle.Flat;
             button7.ForeColor = Color.Transparent;
             button7.Image = (Image)resources.GetObject("button7.Image");
-            button7.Location = new Point(1163, 6);
+            button7.Location = new Point(1172, 6);
             button7.Name = "button7";
             button7.Size = new Size(59, 42);
             button7.TabIndex = 56;
@@ -401,7 +407,7 @@
             label2.BackColor = Color.Transparent;
             label2.Font = new Font("Roboto", 15.75F, FontStyle.Bold);
             label2.ForeColor = Color.FromArgb(202, 57, 0);
-            label2.Location = new Point(995, 89);
+            label2.Location = new Point(997, 98);
             label2.Name = "label2";
             label2.Size = new Size(128, 28);
             label2.TabIndex = 67;
@@ -413,7 +419,7 @@
             label1.BackColor = Color.Transparent;
             label1.Font = new Font("Roboto", 15.75F, FontStyle.Bold);
             label1.ForeColor = Color.FromArgb(202, 57, 0);
-            label1.Location = new Point(995, 182);
+            label1.Location = new Point(997, 191);
             label1.Name = "label1";
             label1.Size = new Size(130, 28);
             label1.TabIndex = 68;
@@ -425,11 +431,74 @@
             label3.BackColor = Color.Transparent;
             label3.Font = new Font("Roboto", 15.75F, FontStyle.Bold);
             label3.ForeColor = Color.FromArgb(202, 57, 0);
-            label3.Location = new Point(995, 274);
+            label3.Location = new Point(997, 283);
             label3.Name = "label3";
             label3.Size = new Size(105, 28);
             label3.TabIndex = 69;
             label3.Text = "ЦЕНА ОТ:";
+            // 
+            // button12
+            // 
+            button12.BackColor = Color.Transparent;
+            button12.BackgroundImageLayout = ImageLayout.None;
+            button12.FlatStyle = FlatStyle.Flat;
+            button12.ForeColor = Color.Transparent;
+            button12.Image = (Image)resources.GetObject("button12.Image");
+            button12.Location = new Point(895, 430);
+            button12.Name = "button12";
+            button12.Size = new Size(40, 40);
+            button12.TabIndex = 74;
+            button12.UseVisualStyleBackColor = false;
+            button12.Click += button12_Click;
+            // 
+            // button13
+            // 
+            button13.BackColor = Color.Transparent;
+            button13.BackgroundImageLayout = ImageLayout.None;
+            button13.FlatStyle = FlatStyle.Flat;
+            button13.ForeColor = Color.Transparent;
+            button13.Image = (Image)resources.GetObject("button13.Image");
+            button13.Location = new Point(803, 430);
+            button13.Name = "button13";
+            button13.Size = new Size(40, 40);
+            button13.TabIndex = 73;
+            button13.UseVisualStyleBackColor = false;
+            button13.Click += button13_Click;
+            // 
+            // button14
+            // 
+            button14.BackColor = Color.Transparent;
+            button14.BackgroundImageLayout = ImageLayout.None;
+            button14.FlatStyle = FlatStyle.Flat;
+            button14.ForeColor = Color.Transparent;
+            button14.Image = (Image)resources.GetObject("button14.Image");
+            button14.Location = new Point(849, 430);
+            button14.Name = "button14";
+            button14.Size = new Size(40, 40);
+            button14.TabIndex = 72;
+            button14.UseVisualStyleBackColor = false;
+            button14.Click += button14_Click;
+            // 
+            // dataGridView2
+            // 
+            dataGridView2.BackgroundColor = Color.White;
+            dataGridView2.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridView2.Location = new Point(593, 476);
+            dataGridView2.Name = "dataGridView2";
+            dataGridView2.Size = new Size(342, 130);
+            dataGridView2.TabIndex = 71;
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.BackColor = Color.Transparent;
+            label5.Font = new Font("Roboto", 24F, FontStyle.Bold, GraphicsUnit.Point, 204);
+            label5.ForeColor = Color.FromArgb(202, 57, 0);
+            label5.Location = new Point(593, 427);
+            label5.Name = "label5";
+            label5.Size = new Size(147, 43);
+            label5.TabIndex = 70;
+            label5.Text = "Сиропы:";
             // 
             // admin_menu
             // 
@@ -437,6 +506,11 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
             ClientSize = new Size(1350, 621);
+            Controls.Add(button12);
+            Controls.Add(button13);
+            Controls.Add(button14);
+            Controls.Add(dataGridView2);
+            Controls.Add(label5);
             Controls.Add(label3);
             Controls.Add(label1);
             Controls.Add(label2);
@@ -472,6 +546,7 @@
             MinimumSize = new Size(1364, 660);
             Name = "admin_menu";
             Text = "Кофейня";
+            Load += admin_menu_Load;
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
@@ -479,6 +554,7 @@
             ((System.ComponentModel.ISupportInitialize)pictureBox4).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox5).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox6).EndInit();
+            ((System.ComponentModel.ISupportInitialize)dataGridView2).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -487,17 +563,17 @@
 
         private DataGridView dataGridView1;
         private PictureBox pictureBox1;
-        private TextBox textBox1;
+        public TextBox textBox1;
         private PictureBox pictureBox2;
-        private TextBox textBox2;
+        public TextBox textBox2;
         private PictureBox pictureBox3;
-        private TextBox textBox3;
+        public TextBox textBox3;
         private PictureBox pictureBox4;
         private CheckBox checkBox1;
         private CheckBox checkBox2;
         private CheckBox checkBox3;
         private Button button1;
-        private Button button2;
+        public Button button2;
         private Button button3;
         private Button button4;
         private Button button5;
@@ -515,5 +591,10 @@
         private Label label2;
         private Label label1;
         private Label label3;
+        private Button button12;
+        private Button button13;
+        private Button button14;
+        private DataGridView dataGridView2;
+        private Label label5;
     }
 }

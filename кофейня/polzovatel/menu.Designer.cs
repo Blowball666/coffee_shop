@@ -162,9 +162,9 @@
             label4.ForeColor = Color.FromArgb(202, 57, 0);
             label4.Location = new Point(86, 26);
             label4.Name = "label4";
-            label4.Size = new Size(108, 43);
+            label4.Size = new Size(118, 43);
             label4.TabIndex = 33;
-            label4.Text = "Меню";
+            label4.Text = "МЕНЮ";
             // 
             // menu
             // 

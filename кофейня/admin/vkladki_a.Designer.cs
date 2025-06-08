@@ -38,11 +38,12 @@
             // 
             label1.AutoSize = true;
             label1.BackColor = Color.Transparent;
-            label1.Font = new Font("Roboto", 24F);
+            label1.Font = new Font("Roboto", 22F);
             label1.ForeColor = Color.FromArgb(202, 57, 0);
-            label1.Location = new Point(6, 59);
+            label1.Location = new Point(14, 45);
+            label1.MaximumSize = new Size(246, 271);
             label1.Name = "label1";
-            label1.Size = new Size(219, 43);
+            label1.Size = new Size(204, 39);
             label1.TabIndex = 34;
             label1.Text = "Ассортимент";
             label1.Click += label1_Click;
@@ -51,11 +52,12 @@
             // 
             label3.AutoSize = true;
             label3.BackColor = Color.Transparent;
-            label3.Font = new Font("Roboto", 24F);
+            label3.Font = new Font("Roboto", 22F);
             label3.ForeColor = Color.FromArgb(202, 57, 0);
-            label3.Location = new Point(6, 205);
+            label3.Location = new Point(14, 126);
+            label3.MaximumSize = new Size(246, 271);
             label3.Name = "label3";
-            label3.Size = new Size(117, 43);
+            label3.Size = new Size(110, 39);
             label3.TabIndex = 33;
             label3.Text = "Выход";
             label3.Click += label3_Click;
@@ -64,11 +66,12 @@
             // 
             label2.AutoSize = true;
             label2.BackColor = Color.Transparent;
-            label2.Font = new Font("Roboto", 24F);
+            label2.Font = new Font("Roboto", 22F);
             label2.ForeColor = Color.FromArgb(202, 57, 0);
-            label2.Location = new Point(6, 132);
+            label2.Location = new Point(14, 86);
+            label2.MaximumSize = new Size(246, 271);
             label2.Name = "label2";
-            label2.Size = new Size(144, 43);
+            label2.Size = new Size(135, 39);
             label2.TabIndex = 35;
             label2.Text = "Бариста";
             label2.Click += label2_Click;
@@ -78,14 +81,12 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
-            ClientSize = new Size(230, 317);
+            ClientSize = new Size(230, 206);
             ControlBox = false;
             Controls.Add(label2);
             Controls.Add(label1);
             Controls.Add(label3);
             Icon = (Icon)resources.GetObject("$this.Icon");
-            MaximumSize = new Size(246, 333);
-            MinimumSize = new Size(246, 333);
             Name = "vkladki_a";
             ShowIcon = false;
             ResumeLayout(false);

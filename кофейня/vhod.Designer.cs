@@ -38,9 +38,12 @@
             label1 = new Label();
             textBox1 = new TextBox();
             button3 = new Button();
+            button4 = new Button();
+            pictureBox3 = new PictureBox();
             ((System.ComponentModel.ISupportInitialize)pictureBoxFon).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
             SuspendLayout();
             // 
             // pictureBoxFon
@@ -55,11 +58,11 @@
             // maskedTextBox1
             // 
             maskedTextBox1.BorderStyle = BorderStyle.None;
-            maskedTextBox1.Font = new Font("Roboto", 20.25F, FontStyle.Bold);
+            maskedTextBox1.Font = new Font("Microsoft Sans Serif", 20.25F, FontStyle.Bold);
             maskedTextBox1.ForeColor = Color.FromArgb(132, 154, 157);
             maskedTextBox1.Location = new Point(487, 206);
             maskedTextBox1.Name = "maskedTextBox1";
-            maskedTextBox1.Size = new Size(373, 36);
+            maskedTextBox1.Size = new Size(373, 31);
             maskedTextBox1.TabIndex = 18;
             maskedTextBox1.Text = "E-Mail";
             maskedTextBox1.Enter += maskedTextBox1_Enter;
@@ -116,22 +119,22 @@
             // 
             label1.AutoSize = true;
             label1.BackColor = Color.Transparent;
-            label1.Font = new Font("Roboto", 44F);
+            label1.Font = new Font("Microsoft Sans Serif", 44F);
             label1.ForeColor = Color.FromArgb(202, 57, 0);
             label1.Location = new Point(586, 86);
             label1.Name = "label1";
-            label1.Size = new Size(171, 78);
+            label1.Size = new Size(165, 67);
             label1.TabIndex = 12;
             label1.Text = "Вход";
             // 
             // textBox1
             // 
             textBox1.BorderStyle = BorderStyle.None;
-            textBox1.Font = new Font("Roboto", 20.25F, FontStyle.Bold);
+            textBox1.Font = new Font("Microsoft Sans Serif", 20.25F, FontStyle.Bold);
             textBox1.ForeColor = Color.FromArgb(132, 154, 157);
             textBox1.Location = new Point(487, 298);
             textBox1.Name = "textBox1";
-            textBox1.Size = new Size(373, 36);
+            textBox1.Size = new Size(373, 31);
             textBox1.TabIndex = 19;
             textBox1.Text = "Пароль";
             textBox1.Enter += textBox1_Enter;
@@ -145,12 +148,35 @@
             button3.FlatStyle = FlatStyle.Flat;
             button3.ForeColor = Color.Transparent;
             button3.Image = (Image)resources.GetObject("button3.Image");
-            button3.Location = new Point(568, 461);
+            button3.Location = new Point(473, 466);
             button3.Name = "button3";
-            button3.Size = new Size(205, 42);
+            button3.Size = new Size(184, 30);
             button3.TabIndex = 20;
             button3.UseVisualStyleBackColor = false;
             button3.Click += button3_Click;
+            // 
+            // button4
+            // 
+            button4.BackColor = Color.Transparent;
+            button4.BackgroundImage = (Image)resources.GetObject("button4.BackgroundImage");
+            button4.BackgroundImageLayout = ImageLayout.None;
+            button4.FlatStyle = FlatStyle.Flat;
+            button4.ForeColor = Color.Transparent;
+            button4.Location = new Point(691, 470);
+            button4.Name = "button4";
+            button4.Size = new Size(199, 19);
+            button4.TabIndex = 21;
+            button4.UseVisualStyleBackColor = false;
+            button4.Click += button4_Click;
+            // 
+            // pictureBox3
+            // 
+            pictureBox3.Image = (Image)resources.GetObject("pictureBox3.Image");
+            pictureBox3.Location = new Point(673, 467);
+            pictureBox3.Name = "pictureBox3";
+            pictureBox3.Size = new Size(10, 29);
+            pictureBox3.TabIndex = 22;
+            pictureBox3.TabStop = false;
             // 
             // vhod
             // 
@@ -158,6 +184,8 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
             ClientSize = new Size(1350, 621);
+            Controls.Add(button4);
+            Controls.Add(pictureBox3);
             Controls.Add(button3);
             Controls.Add(textBox1);
             Controls.Add(maskedTextBox1);
@@ -175,6 +203,7 @@
             ((System.ComponentModel.ISupportInitialize)pictureBoxFon).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -190,5 +219,7 @@
         private Label label1;
         private TextBox textBox1;
         private Button button3;
+        private Button button4;
+        private PictureBox pictureBox3;
     }
 }

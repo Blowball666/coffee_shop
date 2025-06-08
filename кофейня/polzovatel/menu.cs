@@ -7,11 +7,12 @@ namespace кофейня
 {
     public partial class menu : Form
     {
+        private static info currentInfoForm = null;
         private int userId;
         private int userRoleId;
         private DataTable assortmentData;
         private vkladki vkladkiForm;
-        private string connectionString = "Host=172.20.7.6;Database=krezhowa_coffee;Username=st;Password=pwd";
+        private string connectionString = "Host=localhost;Database=coffee_db;Username=postgres;Password=pwd";
 
         public menu(int userId, int userRoleId)
         {
@@ -19,12 +20,12 @@ namespace кофейня
             this.userId = userId;
             this.userRoleId = userRoleId;
             this.StartPosition = FormStartPosition.Manual;
-            this.Location = new Point(0, 0);            
-
+            this.Location = new Point(0, 0);
             assortmentData = new DataTable();
-            LoadData();            
+            LoadData();
             dataGridView1.Columns["id"].Visible = false;
         }
+
         private void PromptForRegistration()
         {
             var result = MessageBox.Show(
@@ -33,21 +34,20 @@ namespace кофейня
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Information
             );
-
             if (result == DialogResult.Yes)
-            {                
+            {
                 registr registrForm = new registr();
                 registrForm.Show();
                 this.Hide();
             }
         }
+
         private void LoadData()
         {
             if (assortmentData == null)
             {
                 assortmentData = new DataTable();
             }
-
             using (var conn = new NpgsqlConnection(connectionString))
             {
                 conn.Open();
@@ -58,6 +58,7 @@ namespace кофейня
             }
             SetupDataGridView();
         }
+
         private void SetupDataGridView()
         {
             dataGridView1.DataSource = assortmentData;
@@ -65,7 +66,6 @@ namespace кофейня
             dataGridView1.Columns["price"].Width = 120;
             dataGridView1.Columns["photo"].Width = 200;
             dataGridView1.RowTemplate.Height = 200;
-
             dataGridView1.Columns["photo"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             dataGridView1.Columns["photo"].DefaultCellStyle.Padding = new Padding(5);
 
@@ -84,10 +84,10 @@ namespace кофейня
             dataGridView1.DefaultCellStyle.SelectionForeColor = Color.Black;
             Font robotoFont = new Font("Roboto", 16, FontStyle.Bold);
             dataGridView1.DefaultCellStyle.Font = robotoFont;
-
             dataGridView1.CellFormatting += DataGridView1_CellFormatting;
             LoadProductImages();
         }
+
         private void DataGridView1_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
             if (e.ColumnIndex == dataGridView1.Columns["addToWishlist"].Index && e.RowIndex >= 0)
@@ -105,19 +105,18 @@ namespace кофейня
                 }
             }
         }
+
         private void LoadProductImages()
         {
             foreach (DataGridViewRow row in dataGridView1.Rows)
             {
                 var imageData = row.Cells["photo"].Value as byte[];
-
                 if (imageData != null && imageData.Length > 0)
                 {
                     using (var ms = new MemoryStream(imageData))
                     {
                         using (var img = Image.FromStream(ms))
                         {
-                            // Масштабируем изображение, чтобы оно вписывалось в ячейку
                             var resizedImage = ResizeImage(img, dataGridView1.Columns["photo"].Width - 10, dataGridView1.RowTemplate.Height - 10);
                             row.Cells["photo"].Value = resizedImage;
                         }
@@ -125,43 +124,35 @@ namespace кофейня
                 }
             }
         }
+
         private Image ResizeImage(Image image, int maxWidth, int maxHeight)
         {
-            // Рассчитываем пропорции, чтобы изображение помещалось в ячейку
             double ratio = Math.Min((double)maxWidth / image.Width, (double)maxHeight / image.Height);
             int newWidth = (int)(image.Width * ratio);
             int newHeight = (int)(image.Height * ratio);
 
-            // Создаем новый объект изображения с нужными размерами
             var resizedImage = new Bitmap(newWidth, newHeight);
-
             using (var g = Graphics.FromImage(resizedImage))
             {
-                g.InterpolationMode = InterpolationMode.HighQualityBicubic;  // Высококачественная интерполяция
-                g.Clear(Color.White);  // Заполнение фоном белым
-                g.DrawImage(image, 0, 0, newWidth, newHeight);  // Отображаем изображение
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                g.Clear(Color.White);
+                g.DrawImage(image, 0, 0, newWidth, newHeight);
             }
-
             return resizedImage;
         }
+
         private Image GetWishlistImage(int assortmentId)
         {
             string filledHeartPath = Path.Combine(Application.StartupPath, "Resources", "значки", "сердце.png");
             string emptyHeartPath = Path.Combine(Application.StartupPath, "Resources", "значки", "пуст_сердце.png");
-
             Image filledHeart = File.Exists(filledHeartPath) ? Image.FromFile(filledHeartPath) : null;
             Image emptyHeart = File.Exists(emptyHeartPath) ? Image.FromFile(emptyHeartPath) : null;
-
             return CheckIfInWishlist(assortmentId) ? filledHeart : emptyHeart;
         }
+
         private bool CheckIfInWishlist(int assortmentId)
         {
-            string query = "SELECT COUNT(*) " +
-                "FROM Wishlist_Items wi " +
-                "JOIN Wishlist w ON wi.wishlist_id = w.id " +
-                "WHERE w.user_id = @userId " +
-                "AND wi.assortment_id = @assortmentId";
-
+            string query = "SELECT COUNT(*) FROM Wishlist WHERE user_id = @userId AND assortment_id = @assortmentId";
             using (var conn = new NpgsqlConnection(connectionString))
             {
                 conn.Open();
@@ -174,10 +165,12 @@ namespace кофейня
                 }
             }
         }
+
         private void ShowNotification(string message)
         {
             MessageBox.Show(message, "Notification", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
+
         private int ExecuteScalarQuery(string query, params NpgsqlParameter[] parameters)
         {
             using (var conn = new NpgsqlConnection(connectionString))
@@ -190,18 +183,27 @@ namespace кофейня
                 }
             }
         }
+
         private void ExecuteNonQuery(string query, params NpgsqlParameter[] parameters)
         {
-            using (var conn = new NpgsqlConnection(connectionString))
+            try
             {
-                conn.Open();
-                using (var cmd = new NpgsqlCommand(query, conn))
+                using (var conn = new NpgsqlConnection(connectionString))
                 {
-                    cmd.Parameters.AddRange(parameters);
-                    cmd.ExecuteNonQuery();
+                    conn.Open();
+                    using (var cmd = new NpgsqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddRange(parameters);
+                        cmd.ExecuteNonQuery();
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при выполнении запроса: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
+
         private void textBox1_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -210,6 +212,7 @@ namespace кофейня
                 button1.PerformClick();
             }
         }
+
         private void textBox1_Enter(object sender, EventArgs e)
         {
             if (textBox1.Text == "ПОИСК")
@@ -217,6 +220,7 @@ namespace кофейня
                 textBox1.Clear();
             }
         }
+
         private void textBox1_Leave(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(textBox1.Text))
@@ -224,6 +228,7 @@ namespace кофейня
                 textBox1.Text = "ПОИСК";
             }
         }
+
         private void PerformSearch()
         {
             string searchText = textBox1.Text.Trim();
@@ -234,13 +239,17 @@ namespace кофейня
                 dataGridView1.DataSource = dv.ToTable();
             }
         }
+
         private void button1_Click(object sender, EventArgs e) => PerformSearch();
+
         private void button2_Click(object sender, EventArgs e)
         {
             textBox1.Text = "ПОИСК";
             DataView dv = assortmentData.DefaultView;
-            dv.RowFilter = string.Empty; dataGridView1.DataSource = dv.ToTable();
+            dv.RowFilter = string.Empty;
+            dataGridView1.DataSource = dv.ToTable();
         }
+
         private void button3_Click(object sender, EventArgs e)
         {
             if (userRoleId == 3) // Проверка, если пользователь - гость
@@ -248,6 +257,8 @@ namespace кофейня
                 PromptForRegistration();
                 return;
             }
+
+            // Открываем форму vkladki без закрытия формы info
             if (vkladkiForm == null || vkladkiForm.IsDisposed)
             {
                 vkladkiForm = new vkladki(userId, this);
@@ -261,13 +272,20 @@ namespace кофейня
                     vkladkiForm.Focus();
                 }
             }
+            if (currentInfoForm != null && !currentInfoForm.IsDisposed)
+            {
+                currentInfoForm.Close();
+                currentInfoForm = null;
+            }
         }
+
         private void dataGridView1_DataError(object sender, DataGridViewDataErrorEventArgs e)
         {
             MessageBox.Show($"Ошибка в столбце {e.ColumnIndex}, строке {e.RowIndex}");
         }
+
         private void DataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
-        {            
+        {
             if (e.RowIndex >= 0 && e.ColumnIndex == dataGridView1.Columns["addToWishlist"].Index)
             {
                 if (userRoleId == 3) // Проверка, если пользователь - гость
@@ -275,69 +293,58 @@ namespace кофейня
                     PromptForRegistration();
                     return;
                 }
+
                 int assortmentId = (int)dataGridView1.Rows[e.RowIndex].Cells["id"].Value;
 
-                int wishlistId = ExecuteScalarQuery(
-                    "SELECT id FROM Wishlist WHERE user_id = @userId",
-                    new NpgsqlParameter("@userId", userId)
-                );
+                // Проверка, есть ли уже товар в отложенных
+                string queryCheck = "SELECT COUNT(*) FROM Wishlist WHERE user_id = @userId AND assortment_id = @assortmentId";
+                int count = ExecuteScalarQuery(queryCheck, new NpgsqlParameter("@userId", userId), new NpgsqlParameter("@assortmentId", assortmentId));
 
-                if (wishlistId == 0)
+                if (count > 0)
                 {
-                    ExecuteNonQuery("INSERT INTO Wishlist (user_id) VALUES (@userId)", new NpgsqlParameter("@userId", userId));
-                    wishlistId = ExecuteScalarQuery("SELECT id FROM Wishlist WHERE user_id = @userId", new NpgsqlParameter("@userId", userId));
-                }
-
-                int itemCount = ExecuteScalarQuery(
-                    "SELECT COUNT(*) FROM Wishlist_Items WHERE wishlist_id = @wishlistId AND assortment_id = @assortmentId",
-                    new NpgsqlParameter("@wishlistId", wishlistId),
-                    new NpgsqlParameter("@assortmentId", assortmentId)
-                );
-
-                if (itemCount > 0)
-                {
+                    // Удаляем товар из отложенных
                     ExecuteNonQuery(
-                        "DELETE FROM Wishlist_Items WHERE wishlist_id = @wishlistId AND assortment_id = @assortmentId",
-                        new NpgsqlParameter("@wishlistId", wishlistId),
+                        "DELETE FROM Wishlist WHERE user_id = @userId AND assortment_id = @assortmentId",
+                        new NpgsqlParameter("@userId", userId),
                         new NpgsqlParameter("@assortmentId", assortmentId)
                     );
-
-                    int remainingItems = ExecuteScalarQuery(
-                        "SELECT COUNT(*) FROM Wishlist_Items WHERE wishlist_id = @wishlistId",
-                        new NpgsqlParameter("@wishlistId", wishlistId)
-                    );
-
-                    if (remainingItems == 0)
-                    {
-                        ExecuteNonQuery("DELETE FROM Wishlist WHERE id = @wishlistId", new NpgsqlParameter("@wishlistId", wishlistId));
-                    }
-
                     ShowNotification("Товар удален из отложенных.");
                 }
                 else
                 {
+                    // Добавляем товар в отложенные
                     ExecuteNonQuery(
-                        "INSERT INTO Wishlist_Items (wishlist_id, assortment_id) VALUES (@wishlistId, @assortmentId)",
-                        new NpgsqlParameter("@wishlistId", wishlistId),
+                        "INSERT INTO Wishlist (user_id, assortment_id) VALUES (@userId, @assortmentId)",
+                        new NpgsqlParameter("@userId", userId),
                         new NpgsqlParameter("@assortmentId", assortmentId)
                     );
-
-                    ShowNotification("Товар добавлен в отложенные.");
                 }
 
+                // Обновляем иконку в DataGrid
                 dataGridView1.Rows[e.RowIndex].Cells["addToWishlist"].Value = GetWishlistImage(assortmentId);
             }
         }
+
         private void DataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex >= 0)
+            if (e.RowIndex >= 0 && (currentInfoForm == null || currentInfoForm.IsDisposed || !currentInfoForm.Visible))
             {
                 int assortmentId = (int)dataGridView1.Rows[e.RowIndex].Cells["id"].Value;
-                var productInfoForm = new info(assortmentId, userId, userRoleId, this);
-                productInfoForm.Show();
-                productInfoForm.FormClosing += (s, args) => UpdateProductInGrid(assortmentId);
+
+                // Создаем новое окно info без закрытия текущего
+                currentInfoForm = new info(assortmentId, userId, userRoleId, this);
+                currentInfoForm.Show();
+
+
+                // Подписываемся на событие закрытия формы info
+                currentInfoForm.FormClosing += (s, args) =>
+                {
+                    UpdateProductInGrid(assortmentId); // Обновляем данные в DataGridView
+                    currentInfoForm = null; // Очищаем ссылку на закрытое окно
+                };
             }
         }
+
         private void UpdateProductInGrid(int assortmentId)
         {
             var row = dataGridView1.Rows.Cast<DataGridViewRow>()
@@ -349,5 +356,7 @@ namespace кофейня
                 row.Cells["addToWishlist"].Value = GetWishlistImage(assortmentId);
             }
         }
+
+        
     }
 }

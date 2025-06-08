@@ -55,11 +55,11 @@
             // 
             label1.AutoSize = true;
             label1.BackColor = Color.Transparent;
-            label1.Font = new Font("Roboto", 44F);
+            label1.Font = new Font("Microsoft Sans Serif", 44F);
             label1.ForeColor = Color.FromArgb(202, 57, 0);
             label1.Location = new Point(484, 9);
             label1.Name = "label1";
-            label1.Size = new Size(390, 78);
+            label1.Size = new Size(379, 67);
             label1.TabIndex = 0;
             label1.Text = "Регистрация";
             // 
@@ -148,7 +148,7 @@
             // richTextBox1
             // 
             richTextBox1.BorderStyle = BorderStyle.None;
-            richTextBox1.Font = new Font("Roboto", 20.25F, FontStyle.Bold);
+            richTextBox1.Font = new Font("Microsoft Sans Serif", 20.25F, FontStyle.Bold, GraphicsUnit.Point, 204);
             richTextBox1.ForeColor = Color.FromArgb(132, 154, 157);
             richTextBox1.Location = new Point(501, 125);
             richTextBox1.Name = "richTextBox1";
@@ -162,11 +162,11 @@
             // maskedTextBox1
             // 
             maskedTextBox1.BorderStyle = BorderStyle.None;
-            maskedTextBox1.Font = new Font("Roboto", 20.25F, FontStyle.Bold);
+            maskedTextBox1.Font = new Font("Microsoft Sans Serif", 20.25F, FontStyle.Bold);
             maskedTextBox1.ForeColor = Color.FromArgb(132, 154, 157);
             maskedTextBox1.Location = new Point(501, 200);
             maskedTextBox1.Name = "maskedTextBox1";
-            maskedTextBox1.Size = new Size(373, 36);
+            maskedTextBox1.Size = new Size(373, 31);
             maskedTextBox1.TabIndex = 11;
             maskedTextBox1.Text = "E-Mail";
             maskedTextBox1.Enter += maskedTextBox1_Enter;
@@ -176,11 +176,11 @@
             // maskedTextBox2
             // 
             maskedTextBox2.BorderStyle = BorderStyle.None;
-            maskedTextBox2.Font = new Font("Roboto", 20.25F, FontStyle.Bold);
+            maskedTextBox2.Font = new Font("Microsoft Sans Serif", 20.25F, FontStyle.Bold);
             maskedTextBox2.ForeColor = Color.FromArgb(132, 154, 157);
             maskedTextBox2.Location = new Point(501, 274);
             maskedTextBox2.Name = "maskedTextBox2";
-            maskedTextBox2.Size = new Size(373, 36);
+            maskedTextBox2.Size = new Size(373, 31);
             maskedTextBox2.TabIndex = 12;
             maskedTextBox2.Text = "Телефон";
             maskedTextBox2.Enter += maskedTextBox2_Enter;
@@ -189,11 +189,11 @@
             // maskedTextBox3
             // 
             maskedTextBox3.BorderStyle = BorderStyle.None;
-            maskedTextBox3.Font = new Font("Roboto", 20.25F, FontStyle.Bold);
+            maskedTextBox3.Font = new Font("Microsoft Sans Serif", 20.25F, FontStyle.Bold, GraphicsUnit.Point, 204);
             maskedTextBox3.ForeColor = Color.FromArgb(132, 154, 157);
             maskedTextBox3.Location = new Point(501, 347);
             maskedTextBox3.Name = "maskedTextBox3";
-            maskedTextBox3.Size = new Size(373, 36);
+            maskedTextBox3.Size = new Size(373, 31);
             maskedTextBox3.TabIndex = 13;
             maskedTextBox3.Text = "Дата рождения";
             maskedTextBox3.Enter += maskedTextBox3_Enter;
@@ -202,11 +202,11 @@
             // textBox1
             // 
             textBox1.BorderStyle = BorderStyle.None;
-            textBox1.Font = new Font("Roboto", 20.25F, FontStyle.Bold);
+            textBox1.Font = new Font("Microsoft Sans Serif", 20.25F, FontStyle.Bold);
             textBox1.ForeColor = Color.FromArgb(132, 154, 157);
             textBox1.Location = new Point(501, 419);
             textBox1.Name = "textBox1";
-            textBox1.Size = new Size(373, 36);
+            textBox1.Size = new Size(373, 31);
             textBox1.TabIndex = 14;
             textBox1.Text = "Пароль";
             textBox1.Enter += textBox1_Enter;

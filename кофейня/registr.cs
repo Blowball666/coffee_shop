@@ -3,13 +3,15 @@ using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Net;
+using System.Net.Mail;
 [assembly: InternalsVisibleTo("TestProjectCoffeeShop")]
 
 namespace кофейня
 {
     public partial class registr : Form
     {
-        private const string ConnectionString = "Host=172.20.7.6;Database=krezhowa_coffee;Username=st;Password=pwd";
+        private const string ConnectionString = "Host=localhost;Database=coffee_db;Username=postgres;Password=pwd";
 
         public registr()
         {
@@ -65,11 +67,41 @@ namespace кофейня
                 button1.PerformClick();
             }
         }
-        private void button1_Click(object sender, EventArgs e)
+        private async Task SendVerificationEmailAsync(string toEmail, string verificationCode)
+        {
+            try
+            {
+                string smtpServer = "smtp.mail.ru";
+                int smtpPort = 587;
+                string smtpUsername = "test_coffee13@mail.ru"; // Email отправителя
+                string smtpPassword = "iqAv1Kfkttji5952SGfq"; // Пароль для внешних приложений
+
+                using (MailMessage mail = new MailMessage())
+                using (SmtpClient smtp = new SmtpClient(smtpServer, smtpPort))
+                {
+                    mail.From = new MailAddress(smtpUsername, "Кофейня");
+                    mail.To.Add(toEmail);
+                    mail.Subject = "Добро пожаловать в кофейню!";
+                    mail.Body = $"Ваш код подтверждения: {verificationCode}";
+                    mail.IsBodyHtml = false;
+
+                    smtp.Credentials = new NetworkCredential(smtpUsername, smtpPassword);
+                    smtp.EnableSsl = true;
+
+                    await smtp.SendMailAsync(mail);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при отправке письма: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
+        private async void button1_Click(object sender, EventArgs e)
         {
             var errorMessage = new StringBuilder();
 
-            // Проверка на наличие фамилии и имени
             string fullName = richTextBox1.Text.Trim();
             string[] names = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
@@ -89,64 +121,76 @@ namespace кофейня
             if (string.IsNullOrWhiteSpace(userEmail) || string.IsNullOrWhiteSpace(userPhone) ||
                 string.IsNullOrWhiteSpace(userPassword) || userBirthday == "Дата рождения")
             {
-                errorMessage.AppendLine("Заполните все поля перед сохранением в базу данных.");
+                errorMessage.AppendLine("Заполните все поля перед регистрацией.");
             }
 
-            // Проверка email
             if (!Regex.IsMatch(userEmail, @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"))
             {
                 errorMessage.AppendLine("Некорректный email.");
             }
 
-            // Проверка номера телефона
             if (!Regex.IsMatch(userPhone, @"^8\(\d{3}\)\d{3}-\d{2}-\d{2}$"))
             {
                 errorMessage.AppendLine("Некорректный номер телефона.");
             }
 
-            // Проверка на корректность даты рождения
-            if (!DateTime.TryParse(userBirthday, out DateTime birthday))
+            if (!DateTime.TryParse(userBirthday, out DateTime birthday) || birthday > DateTime.Now)
             {
-                errorMessage.AppendLine("Введите правильно дату рождения.");
+                errorMessage.AppendLine("Введите корректную дату рождения.");
             }
 
-            if (birthday > DateTime.Now)
-            {
-                errorMessage.AppendLine("Дата рождения не может быть в будущем.");
-            }
-
-            // Проверка пароля
             if (userPassword.Length < 8 || !Regex.IsMatch(userPassword, @"^(?=.*[a-zA-Z])(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?!.*[А-Яа-яЁё]).{8,}$"))
             {
                 errorMessage.AppendLine("Пароль должен содержать не менее 8 символов, включая цифры, строчные и заглавные латинские буквы.");
             }
 
-            // Если есть ошибки
             if (errorMessage.Length > 0)
             {
                 MessageBox.Show(errorMessage.ToString(), "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            // Получаем ID нового пользователя
-            int newUserId = SaveUserToDatabase(userName, userLastname, userEmail, userPhone, birthday, userPassword);
+            // Генерируем код подтверждения
+            string verificationCode = GenerateVerificationCode();
+
+            // Отправляем код на email в отдельном потоке
+            await Task.Run(() => SendVerificationEmailAsync(userEmail, verificationCode));
+
+            // Использование созданной формы verificationForm
+            using (var verificationForm = new coffee.verificationForm())
+            {
+                verificationForm.Code = verificationCode; // Передаем код подтверждения
+
+                var result = verificationForm.ShowDialog();
+
+                if (result == DialogResult.Cancel)
+                {
+                    MessageBox.Show("Регистрация отменена.", "Отмена", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+            }
+
+            // Сохраняем пользователя в БД
+            int newUserId = await SaveUserToDatabaseAsync(userName, userLastname, userEmail, userPhone, birthday, userPassword);
 
             if (newUserId > 0)
             {
-                MessageBox.Show("Данные успешно сохранены!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Регистрация завершена! Добро пожаловать!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
                 menu form2 = new menu(newUserId, 2);
                 this.Hide();
                 form2.Closed += (s, args) => this.Close();
-                form2.Show();
+                form2.ShowDialog();
+                this.Close();
             }
             else
             {
-                MessageBox.Show("Произошла ошибка при сохранении данных в базу данных.",
-                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Ошибка при сохранении данных.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        private int SaveUserToDatabase(string userName, string userLastname, string userEmail, string userPhone,
-            DateTime userBirthday, string userPassword)
+
+        private async Task<int> SaveUserToDatabaseAsync(string userName, string userLastname, string userEmail, string userPhone,
+    DateTime userBirthday, string userPassword)
         {
             string hashedPassword = HashPassword(userPassword);
 
@@ -154,38 +198,65 @@ namespace кофейня
             {
                 try
                 {
-                    connection.Open();
+                    await connection.OpenAsync();
 
-                    // Проверка на существование email
-                    string checkEmailQuery = "SELECT COUNT(*) FROM Users WHERE email = @userEmail";
-                    using (NpgsqlCommand checkCommand = new NpgsqlCommand(checkEmailQuery, connection))
+                    using (var transaction = await connection.BeginTransactionAsync()) // Начинаем транзакцию
                     {
-                        checkCommand.Parameters.AddWithValue("@userEmail", userEmail);
-                        int emailCount = Convert.ToInt32(checkCommand.ExecuteScalar());
-
-                        if (emailCount > 0)
+                        try
                         {
-                            MessageBox.Show("Почта уже занята. Попробуйте войти или используйте другой адрес электронной почты.",
-                                "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                            return -1;
+                            // Проверка на существование email
+                            string checkEmailQuery = "SELECT COUNT(*) FROM Users WHERE email = @userEmail";
+                            using (NpgsqlCommand checkCommand = new NpgsqlCommand(checkEmailQuery, connection, transaction))
+                            {
+                                checkCommand.Parameters.AddWithValue("@userEmail", userEmail);
+                                int emailCount = Convert.ToInt32(await checkCommand.ExecuteScalarAsync());
+
+                                if (emailCount > 0)
+                                {
+                                    MessageBox.Show("Почта уже занята. Попробуйте войти или используйте другой адрес электронной почты.",
+                                        "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                    return -1;
+                                }
+                            }
+
+                            // Вставка нового пользователя
+                            string query = "INSERT INTO Users (first_name, last_name, email, password, phone, birth_date, role_id) " +
+                                           "VALUES (@userName, @userLastname, @userEmail, @userPassword, @userPhone, @userBirthday, 2) " +
+                                           "RETURNING id";
+                            int newUserId;
+                            using (NpgsqlCommand command = new NpgsqlCommand(query, connection, transaction))
+                            {
+                                command.Parameters.AddWithValue("@userLastname", userLastname);
+                                command.Parameters.AddWithValue("@userName", userName);
+                                command.Parameters.AddWithValue("@userEmail", userEmail);
+                                command.Parameters.AddWithValue("@userPassword", hashedPassword);
+                                command.Parameters.AddWithValue("@userPhone", userPhone);
+                                command.Parameters.AddWithValue("@userBirthday", userBirthday);
+
+                                newUserId = Convert.ToInt32(await command.ExecuteScalarAsync());
+                            }
+
+                            // Вставка бонусных 200 баллов
+                            string insertTransactionQuery = "INSERT INTO Points_Transactions (user_id, transaction_type, points, transaction_date) " +
+                                                            "VALUES (@userId, 'earn', 200, @transactionDate)";
+                            using (NpgsqlCommand transactionCommand = new NpgsqlCommand(insertTransactionQuery, connection, transaction))
+                            {
+                                transactionCommand.Parameters.AddWithValue("@userId", newUserId);
+                                transactionCommand.Parameters.AddWithValue("@transactionDate", DateTime.UtcNow);
+
+                                await transactionCommand.ExecuteNonQueryAsync();
+                            }
+
+                            // Подтверждение транзакции
+                            await transaction.CommitAsync();
+
+                            return newUserId;
                         }
-                    }
-
-                    // Вставка данных нового пользователя
-                    string query = "INSERT INTO Users (first_name, last_name, email, password, phone, birth_date, role_id, points) " +
-                                   "VALUES (@userName, @userLastname, @userEmail, @userPassword, @userPhone, @userBirthday, 2, 200) " +
-                                   "RETURNING id";
-                    using (NpgsqlCommand command = new NpgsqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@userLastname", userLastname);
-                        command.Parameters.AddWithValue("@userName", userName);
-                        command.Parameters.AddWithValue("@userEmail", userEmail);
-                        command.Parameters.AddWithValue("@userPassword", hashedPassword);
-                        command.Parameters.AddWithValue("@userPhone", userPhone);
-                        command.Parameters.AddWithValue("@userBirthday", userBirthday);
-
-                        int newUserId = Convert.ToInt32(command.ExecuteScalar());
-                        return newUserId;
+                        catch (Exception)
+                        {
+                            await transaction.RollbackAsync(); // Откат в случае ошибки
+                            throw;
+                        }
                     }
                 }
                 catch (NpgsqlException ex)
@@ -195,6 +266,12 @@ namespace кофейня
                 }
             }
         }
+        private string GenerateVerificationCode()
+        {
+            Random random = new Random();
+            return random.Next(100000, 999999).ToString();
+        }
+
         internal string HashPassword(string password) // хэширование пароля
         {
             using (SHA256 sha256 = SHA256.Create())

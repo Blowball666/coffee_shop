@@ -1,8 +1,8 @@
-using кофейня;
-using NUnit.Framework;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
+using кофейня;
 
-namespace CoffeeShopTests
+namespace TestProjectCoffeeShop
 {
     [TestFixture]
     public class RegistrTests
@@ -53,6 +53,46 @@ namespace CoffeeShopTests
             string invalidPhone = "1234567890";
             bool isValid = Regex.IsMatch(invalidPhone, @"^8\(\d{3}\)\d{3}-\d{2}-\d{2}$");
             Assert.That(isValid, Is.False);
+        }
+        [Test]
+        public void Test_EmptyFields_ShowWarningMessage()
+        {
+            // Установим пустые значения в поля ввода
+            _registr.richTextBox1.Text = "";
+            _registr.maskedTextBox1.Text = "";
+            _registr.maskedTextBox2.Text = "";
+            _registr.maskedTextBox3.Text = "";
+            _registr.textBox1.Text = "";
+            // Слушаем вызов кнопки для создания пользователя
+            _registr.button1.PerformClick();
+            // Проверяем, что показано сообщение об ошибке
+            MessageBoxTestHelper.AssertMessageBoxShown("Заполните все поля перед сохранением в базу данных.", MessageBoxIcon.Warning);
+        }
+
+        [Test]
+        public void Test_InvalidEmail_ShowErrorMessage()
+        {
+            _registr.richTextBox1.Text = "Имя Фамилия";
+            _registr.maskedTextBox1.Text = "invalidemail.com"; // Некорректный email
+            _registr.maskedTextBox2.Text = "8(123)456-78-90";
+            _registr.maskedTextBox3.Text = "2000/01/01";
+            _registr.textBox1.Text = "Password123";
+            _registr.button1.PerformClick();
+            // Проверяем, что показано сообщение об ошибке
+            MessageBoxTestHelper.AssertMessageBoxShown("Некорректный email.", MessageBoxIcon.Error);
+        }
+
+        [Test]
+        public void Test_InvalidPhone_ShowErrorMessage()
+        {
+            _registr.richTextBox1.Text = "Имя Фамилия";
+            _registr.maskedTextBox1.Text = "test@example.com";
+            _registr.maskedTextBox2.Text = "123456789"; // Некорректный номер телефона
+            _registr.maskedTextBox3.Text = "2000/01/01";
+            _registr.textBox1.Text = "Password123";
+            _registr.button1.PerformClick();
+            // Проверяем, что показано сообщение об ошибке
+            MessageBoxTestHelper.AssertMessageBoxShown("Некорректный номер телефона.", MessageBoxIcon.Error);
         }
     }
 }

@@ -42,6 +42,7 @@
             pictureBox1 = new PictureBox();
             label2 = new Label();
             label3 = new Label();
+            label4 = new Label();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
@@ -54,9 +55,9 @@
             label1.ForeColor = Color.FromArgb(202, 57, 0);
             label1.Location = new Point(86, 26);
             label1.Name = "label1";
-            label1.Size = new Size(145, 43);
+            label1.Size = new Size(169, 43);
             label1.TabIndex = 31;
-            label1.Text = "Корзина";
+            label1.Text = "КОРЗИНА";
             // 
             // button1
             // 
@@ -96,7 +97,7 @@
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             dataGridView1.EnableHeadersVisualStyles = false;
             dataGridView1.GridColor = Color.White;
-            dataGridView1.Location = new Point(415, 2);
+            dataGridView1.Location = new Point(343, 4);
             dataGridView1.Margin = new Padding(0);
             dataGridView1.Name = "dataGridView1";
             dataGridView1.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
@@ -111,7 +112,7 @@
             dataGridView1.RowHeadersVisible = false;
             dataGridView1.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToFirstHeader;
             dataGridView1.ShowEditingIcon = false;
-            dataGridView1.Size = new Size(926, 524);
+            dataGridView1.Size = new Size(1001, 524);
             dataGridView1.TabIndex = 33;
             dataGridView1.TabStop = false;
             dataGridView1.CellContentClick += dataGridView1_CellContentClick;
@@ -164,7 +165,7 @@
             button3.FlatStyle = FlatStyle.Flat;
             button3.ForeColor = Color.Transparent;
             button3.Image = (Image)resources.GetObject("button3.Image");
-            button3.Location = new Point(12, 532);
+            button3.Location = new Point(11, 536);
             button3.Name = "button3";
             button3.Size = new Size(357, 78);
             button3.TabIndex = 73;
@@ -178,7 +179,7 @@
             button4.FlatStyle = FlatStyle.Flat;
             button4.ForeColor = Color.Transparent;
             button4.Image = (Image)resources.GetObject("button4.Image");
-            button4.Location = new Point(351, 18);
+            button4.Location = new Point(282, 18);
             button4.Name = "button4";
             button4.Size = new Size(53, 56);
             button4.TabIndex = 76;
@@ -189,9 +190,9 @@
             // 
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
             pictureBox1.InitialImage = null;
-            pictureBox1.Location = new Point(26, 107);
+            pictureBox1.Location = new Point(6, 96);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(350, 350);
+            pictureBox1.Size = new Size(331, 350);
             pictureBox1.TabIndex = 78;
             pictureBox1.TabStop = false;
             // 
@@ -201,7 +202,7 @@
             label2.BackColor = Color.Transparent;
             label2.Font = new Font("Roboto", 18F);
             label2.ForeColor = Color.FromArgb(202, 57, 0);
-            label2.Location = new Point(415, 581);
+            label2.Location = new Point(415, 576);
             label2.Name = "label2";
             label2.Size = new Size(238, 32);
             label2.TabIndex = 79;
@@ -213,11 +214,23 @@
             label3.BackColor = Color.Transparent;
             label3.Font = new Font("Roboto", 20F, FontStyle.Bold);
             label3.ForeColor = Color.FromArgb(202, 57, 0);
-            label3.Location = new Point(12, 480);
+            label3.Location = new Point(12, 458);
             label3.Name = "label3";
             label3.Size = new Size(317, 35);
             label3.TabIndex = 80;
             label3.Text = "Итоговая стоимость: ...";
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.BackColor = Color.Transparent;
+            label4.Font = new Font("Roboto", 18F);
+            label4.ForeColor = Color.FromArgb(202, 57, 0);
+            label4.Location = new Point(15, 498);
+            label4.Name = "label4";
+            label4.Size = new Size(260, 32);
+            label4.TabIndex = 81;
+            label4.Text = "Начислится ... баллов";
             // 
             // korz
             // 
@@ -225,6 +238,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
             ClientSize = new Size(1350, 621);
+            Controls.Add(label4);
             Controls.Add(label3);
             Controls.Add(label2);
             Controls.Add(pictureBox1);
@@ -259,5 +273,6 @@
         private PictureBox pictureBox1;
         internal Label label2;
         internal Label label3;
+        internal Label label4;
     }
 }

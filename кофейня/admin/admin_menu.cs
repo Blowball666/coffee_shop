@@ -1,5 +1,4 @@
 ﻿using System.Data;
-using System.Windows.Forms;
 using Npgsql;
 using OfficeOpenXml;
 using кофейня.admin;
@@ -8,12 +7,11 @@ namespace кофейня
 {
     public partial class admin_menu : Form
     {
-        private const string ConnectionString = "Host=172.20.7.6;Database=krezhowa_coffee;Username=st;Password=pwd";
+        private const string ConnectionString = "Host=localhost;Database=coffee_db;Username=postgres;Password=pwd";
         private string defaultImagePath = Path.Combine(Application.StartupPath, "Resources", "значки", "фото_не_найдено.png");
         private string selectedImagePath;
         private int selectedProductId = -1;
         private vkladki_a vkladkiForm;
-        private PrintDialog printDialog;
 
         public admin_menu()
         {
@@ -21,9 +19,9 @@ namespace кофейня
             SetupDataGridView();
             LoadAllProducts();
             selectedImagePath = defaultImagePath;
-            printDialog = new PrintDialog();
             this.StartPosition = FormStartPosition.Manual;
-            this.Location = new Point(0, 0);            
+            this.Location = new Point(0, 0);
+            LoadAllSyrups();
         }
 
         private void SetupDataGridView()
@@ -39,9 +37,22 @@ namespace кофейня
             dataGridView1.DefaultCellStyle.Font = robotoFont;
             dataGridView1.ReadOnly = true;
             dataGridView1.AllowUserToAddRows = false;
+
+            dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+
+            // Установка стиля выделения
+            dataGridView2.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dataGridView2.DefaultCellStyle.SelectionBackColor = Color.FromArgb(245, 226, 218);
+            dataGridView2.DefaultCellStyle.SelectionForeColor = Color.Black;
+
+            // Установка шрифта
+            dataGridView2.DefaultCellStyle.Font = robotoFont;
+            dataGridView2.ReadOnly = true;
+            dataGridView2.AllowUserToAddRows = false;
+
         }
         // Обработчик для кнопки сохранения изменений
-        private void button1_Click(object sender, EventArgs e)
+        public void button1_Click(object sender, EventArgs e)
         {
             if (ValidateInputs())
             {
@@ -62,85 +73,45 @@ namespace кофейня
                 }
             }
         }
-        private void UpdateAssortmentRelations(int productId, bool canChooseSize, bool canAddSyrup)
+        public void UpdateAssortmentRelations(int productId, bool canChooseSize, bool canAddSyrup)
         {
             try
             {
                 using (var connection = new NpgsqlConnection(ConnectionString))
                 {
                     connection.Open();
-
-                    // Обязательные связи для обычного размера и сиропа
-                    var ensureDefaultSizeQuery = "INSERT INTO Assortment_Sizes (assortment_id, size_id) VALUES (@ProductId, 1) ON CONFLICT DO NOTHING";
-                    var ensureDefaultSyrupQuery = "INSERT INTO Assortment_Syrups (assortment_id, syrup_id) VALUES (@ProductId, 2) ON CONFLICT DO NOTHING";
-
-                    using (var ensureDefaultSizeCommand = new NpgsqlCommand(ensureDefaultSizeQuery, connection))
+                    // Удаляем старые связи
+                    var deleteSizesQuery = "DELETE FROM Assortment_Sizes WHERE assortment_id = @ProductId";
+                    var deleteSyrupsQuery = "DELETE FROM Assortment_Syrups WHERE assortment_id = @ProductId";
+                    using (var deleteSizesCommand = new NpgsqlCommand(deleteSizesQuery, connection))
                     {
-                        ensureDefaultSizeCommand.Parameters.AddWithValue("@ProductId", productId);
-                        ensureDefaultSizeCommand.ExecuteNonQuery();
+                        deleteSizesCommand.Parameters.AddWithValue("@ProductId", productId);
+                        deleteSizesCommand.ExecuteNonQuery();
                     }
-
-                    using (var ensureDefaultSyrupCommand = new NpgsqlCommand(ensureDefaultSyrupQuery, connection))
+                    using (var deleteSyrupsCommand = new NpgsqlCommand(deleteSyrupsQuery, connection))
                     {
-                        ensureDefaultSyrupCommand.Parameters.AddWithValue("@ProductId", productId);
-                        ensureDefaultSyrupCommand.ExecuteNonQuery();
+                        deleteSyrupsCommand.Parameters.AddWithValue("@ProductId", productId);
+                        deleteSyrupsCommand.ExecuteNonQuery();
                     }
-
-                    // Обновление дополнительных связей для размеров
+                    // Создаем новые связи
                     if (canChooseSize)
                     {
-                        var deleteSizesQuery = "DELETE FROM Assortment_Sizes WHERE assortment_id = @ProductId AND size_id <> 1";
-                        using (var deleteSizesCommand = new NpgsqlCommand(deleteSizesQuery, connection))
-                        {
-                            deleteSizesCommand.Parameters.AddWithValue("@ProductId", productId);
-                            deleteSizesCommand.ExecuteNonQuery();
-                        }
-
-                        var insertAllSizesQuery = "INSERT INTO Assortment_Sizes (assortment_id, size_id) " +
-                                                  "SELECT @ProductId, id FROM Sizes WHERE id <> 1 ON CONFLICT DO NOTHING";
-                        using (var insertSizesCommand = new NpgsqlCommand(insertAllSizesQuery, connection))
+                        var insertSizesQuery = "INSERT INTO Assortment_Sizes (assortment_id, size_id) " +
+                                               "SELECT @ProductId, id FROM Sizes ON CONFLICT DO NOTHING";
+                        using (var insertSizesCommand = new NpgsqlCommand(insertSizesQuery, connection))
                         {
                             insertSizesCommand.Parameters.AddWithValue("@ProductId", productId);
                             insertSizesCommand.ExecuteNonQuery();
                         }
                     }
-                    else
-                    {
-                        // Удаляем все, кроме обязательного размера
-                        var deleteAllSizesQuery = "DELETE FROM Assortment_Sizes WHERE assortment_id = @ProductId AND size_id <> 1";
-                        using (var deleteAllSizesCommand = new NpgsqlCommand(deleteAllSizesQuery, connection))
-                        {
-                            deleteAllSizesCommand.Parameters.AddWithValue("@ProductId", productId);
-                            deleteAllSizesCommand.ExecuteNonQuery();
-                        }
-                    }
-
-                    // Обновление дополнительных связей для сиропов
                     if (canAddSyrup)
                     {
-                        var deleteSyrupsQuery = "DELETE FROM Assortment_Syrups WHERE assortment_id = @ProductId AND syrup_id <> 2";
-                        using (var deleteSyrupsCommand = new NpgsqlCommand(deleteSyrupsQuery, connection))
-                        {
-                            deleteSyrupsCommand.Parameters.AddWithValue("@ProductId", productId);
-                            deleteSyrupsCommand.ExecuteNonQuery();
-                        }
-
-                        var insertAllSyrupsQuery = "INSERT INTO Assortment_Syrups (assortment_id, syrup_id) " +
-                                                   "SELECT @ProductId, id FROM Syrups WHERE id <> 2 ON CONFLICT DO NOTHING";
-                        using (var insertSyrupsCommand = new NpgsqlCommand(insertAllSyrupsQuery, connection))
+                        var insertSyrupsQuery = "INSERT INTO Assortment_Syrups (assortment_id, syrup_id) " +
+                                                "SELECT @ProductId, id FROM Syrups ON CONFLICT DO NOTHING";
+                        using (var insertSyrupsCommand = new NpgsqlCommand(insertSyrupsQuery, connection))
                         {
                             insertSyrupsCommand.Parameters.AddWithValue("@ProductId", productId);
                             insertSyrupsCommand.ExecuteNonQuery();
-                        }
-                    }
-                    else
-                    {
-                        // Удаляем все, кроме обязательного сиропа
-                        var deleteAllSyrupsQuery = "DELETE FROM Assortment_Syrups WHERE assortment_id = @ProductId AND syrup_id <> 2";
-                        using (var deleteAllSyrupsCommand = new NpgsqlCommand(deleteAllSyrupsQuery, connection))
-                        {
-                            deleteAllSyrupsCommand.Parameters.AddWithValue("@ProductId", productId);
-                            deleteAllSyrupsCommand.ExecuteNonQuery();
                         }
                     }
                 }
@@ -155,13 +126,11 @@ namespace кофейня
             using (var connection = new NpgsqlConnection(ConnectionString))
             {
                 connection.Open();
-
                 // Если фото не указано, использовать фото по умолчанию
                 if (string.IsNullOrEmpty(selectedImagePath))
                 {
                     selectedImagePath = defaultImagePath;
                 }
-
                 if (selectedProductId != -1)
                 {
                     // Обновление товара
@@ -178,10 +147,8 @@ namespace кофейня
                         command.Parameters.AddWithValue("@CanChooseSize", checkBox2.Checked);
                         command.Parameters.AddWithValue("@CanAddSyrup", checkBox3.Checked);
                         command.Parameters.AddWithValue("@ProductId", selectedProductId);
-
                         byte[] photoBytes = File.ReadAllBytes(selectedImagePath);
                         command.Parameters.AddWithValue("@Photo", photoBytes);
-
                         command.ExecuteNonQuery();
                     }
                     return selectedProductId;
@@ -199,17 +166,15 @@ namespace кофейня
                         command.Parameters.AddWithValue("@InStock", checkBox1.Checked);
                         command.Parameters.AddWithValue("@CanChooseSize", checkBox2.Checked);
                         command.Parameters.AddWithValue("@CanAddSyrup", checkBox3.Checked);
-
                         byte[] photoBytes = File.ReadAllBytes(selectedImagePath);
                         command.Parameters.AddWithValue("@Photo", photoBytes);
-
                         return Convert.ToInt32(command.ExecuteScalar());
                     }
                 }
             }
         }
         // Проверка введенных данных
-        private bool ValidateInputs()
+        public bool ValidateInputs()
         {
             if (string.IsNullOrWhiteSpace(textBox1.Text) ||
                 string.IsNullOrWhiteSpace(textBox2.Text) ||
@@ -231,8 +196,6 @@ namespace кофейня
                     using (var connection = new NpgsqlConnection(ConnectionString))
                     {
                         connection.Open();
-
-                        // Добавление нового товара
                         var query = "INSERT INTO Assortment (name, description, price, in_stock, can_choose_size, can_add_syrup, photo) " +
                                     "VALUES (@Name, @Description, @Price, @InStock, @CanChooseSize, @CanAddSyrup, @Photo) RETURNING id";
                         int newProductId;
@@ -244,22 +207,12 @@ namespace кофейня
                             command.Parameters.AddWithValue("@InStock", checkBox1.Checked);
                             command.Parameters.AddWithValue("@CanChooseSize", checkBox2.Checked);
                             command.Parameters.AddWithValue("@CanAddSyrup", checkBox3.Checked);
-
-                            if (!string.IsNullOrEmpty(selectedImagePath))
-                            {
-                                byte[] photoBytes = File.ReadAllBytes(selectedImagePath);
-                                command.Parameters.AddWithValue("@Photo", photoBytes);
-                            }
-                            else
-                            {
-                                command.Parameters.AddWithValue("@Photo", DBNull.Value);
-                            }
-
-                            // Получение ID нового товара
+                            byte[] photoBytes = File.ReadAllBytes(selectedImagePath);
+                            command.Parameters.AddWithValue("@Photo", photoBytes);
                             newProductId = Convert.ToInt32(command.ExecuteScalar());
                         }
 
-                        // Вызов универсального метода для обновления/создания связей
+                        // Обновляем связи
                         UpdateAssortmentRelations(newProductId, checkBox2.Checked, checkBox3.Checked);
 
                         LoadAllProducts();
@@ -272,6 +225,7 @@ namespace кофейня
                 }
             }
         }
+
         // Кнопка выбора фото для продукта
         private void button4_Click(object sender, EventArgs e)
         {
@@ -333,8 +287,8 @@ namespace кофейня
                         try
                         {
                             // Удаление записей из связанных таблиц
-                            string deleteWishlistItemsQuery = "DELETE FROM Wishlist_Items WHERE assortment_id = @ProductId";
-                            string deleteDesiredProductQuery = "DELETE FROM DesiredProduct WHERE assortment_id = @ProductId";
+                            string deleteWishlistItemsQuery = "DELETE FROM Wishlist WHERE assortment_id = @ProductId";
+                            string deleteDesiredProductQuery = "DELETE FROM Desired_Product WHERE assortment_id = @ProductId";
                             string deleteAssortmentSizesQuery = "DELETE FROM Assortment_Sizes WHERE assortment_id = @ProductId";
                             string deleteAssortmentSyrupsQuery = "DELETE FROM Assortment_Syrups WHERE assortment_id = @ProductId";
 
@@ -491,7 +445,7 @@ namespace кофейня
             {
                 MessageBox.Show($"Ошибка загрузки фото: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }        
+        }
         private void button7_Click(object sender, EventArgs e)
         {
             if (textBox4.Text == "ПОИСК" || string.IsNullOrWhiteSpace(textBox4.Text))
@@ -571,7 +525,6 @@ namespace кофейня
                 "Введите месяц и год в формате MM/YYYY:",
                 "Выбор месяца",
                 DateTime.Now.ToString("MM/yyyy"));
-
             if (!string.IsNullOrEmpty(input))
             {
                 try
@@ -580,38 +533,31 @@ namespace кофейня
                     if (DateTime.TryParseExact(input, "MM/yyyy", null, System.Globalization.DateTimeStyles.None, out selectedDate))
                     {
                         string selectedMonthYear = selectedDate.ToString("yyyy-MM");
-
                         var saveFileDialog = new SaveFileDialog
                         {
                             Filter = "Excel Files|*.xlsx",
                             Title = "Сохранить отчет",
                             FileName = $"Отчет_{selectedMonthYear}.xlsx"
                         };
-
                         if (saveFileDialog.ShowDialog() == DialogResult.OK)
                         {
                             using (var connection = new NpgsqlConnection(ConnectionString))
                             {
                                 connection.Open();
-
-                                // Запрос для получения итогов                                
+                                // Запрос для получения итогов
                                 var summaryQuery = @"
-                                SELECT * 
-                                FROM MonthlyOrderReport
-                                WHERE order_year::TEXT || '-' || LPAD(order_month::TEXT, 2, '0') = @selectedMonthYear";
-
-
+                            SELECT * 
+                            FROM MonthlyOrderReport
+                            WHERE order_year::TEXT || '-' || LPAD(order_month::TEXT, 2, '0') = @selectedMonthYear";
                                 using (var summaryCommand = new NpgsqlCommand(summaryQuery, connection))
                                 {
                                     summaryCommand.Parameters.AddWithValue("@selectedMonthYear", selectedMonthYear);
-
                                     using (var summaryReader = summaryCommand.ExecuteReader())
                                     {
                                         // Создаем Excel файл
                                         using (var package = new ExcelPackage())
                                         {
                                             var worksheet = package.Workbook.Worksheets.Add("Отчет");
-
                                             // Заполняем заголовки
                                             worksheet.Cells[1, 1].Value = "Год";
                                             worksheet.Cells[1, 2].Value = "Месяц";
@@ -620,7 +566,6 @@ namespace кофейня
                                             worksheet.Cells[1, 5].Value = "Общий доход";
                                             worksheet.Cells[1, 6].Value = "Потраченные баллы";
                                             worksheet.Cells[1, 7].Value = "Заработанные баллы";
-
                                             int row = 2;
                                             while (summaryReader.Read())
                                             {
@@ -633,34 +578,28 @@ namespace кофейня
                                                 worksheet.Cells[row, 7].Value = summaryReader["points_earned"];
                                                 row++;
                                             }
-
                                             // Добавляем границы для итогов
                                             worksheet.Cells[1, 1, row - 1, 7].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
                                             worksheet.Cells[1, 1, row - 1, 7].Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
                                             worksheet.Cells[1, 1, row - 1, 7].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
                                             worksheet.Cells[1, 1, row - 1, 7].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-
                                             // Закрытие ридера для итогов
                                             summaryReader.Close();
-
                                             // Переход к запросу заказов
                                             var ordersQuery = @"
-                                            SELECT order_id, user_email, 
-                                                   order_date::DATE AS order_date, 
-                                                   order_date::TIME AS order_time, 
-                                                   total_price, quantity, 
-                                                   points_spent, assortment_name, 
-                                                   size_name, syrup_name, 
-                                                   price, status
-                                            FROM OrderDetails
-                                            WHERE TO_CHAR(order_date, 'YYYY-MM') = @selectedMonthYear
-                                            ORDER BY order_date";
-
-
+                                       SELECT order_id, user_email, 
+                                               order_date, 
+                                               order_time,
+                                               total_price, quantity, 
+                                               points_spent, assortment_name, 
+                                               size_name, syrup_names, 
+                                               price, status
+                                        FROM OrderDetails
+                                        WHERE TO_CHAR(order_date, 'YYYY-MM') = @selectedMonthYear
+                                        ORDER BY order_date";
                                             using (var ordersCommand = new NpgsqlCommand(ordersQuery, connection))
                                             {
                                                 ordersCommand.Parameters.AddWithValue("@selectedMonthYear", selectedMonthYear);
-
                                                 using (var ordersReader = ordersCommand.ExecuteReader())
                                                 {
                                                     int orderRow = row + 2;
@@ -670,44 +609,47 @@ namespace кофейня
                                                     worksheet.Cells[orderRow, 4].Value = "Время заказа";
                                                     worksheet.Cells[orderRow, 5].Value = "Итоговая цена";
                                                     worksheet.Cells[orderRow, 6].Value = "Количество товаров";
-                                                    worksheet.Cells[orderRow, 7].Value = "Баллы";
+                                                    worksheet.Cells[orderRow, 7].Value = "Потраченные баллы";
                                                     worksheet.Cells[orderRow, 8].Value = "Название товара";
                                                     worksheet.Cells[orderRow, 9].Value = "Размер";
-                                                    worksheet.Cells[orderRow, 10].Value = "Сироп";
+                                                    worksheet.Cells[orderRow, 10].Value = "Сиропы"; // Исправлено название столбца
                                                     worksheet.Cells[orderRow, 11].Value = "Цена";
                                                     worksheet.Cells[orderRow, 12].Value = "Статус";
-
                                                     orderRow++;
-
                                                     while (ordersReader.Read())
                                                     {
                                                         worksheet.Cells[orderRow, 1].Value = ordersReader["order_id"];
                                                         worksheet.Cells[orderRow, 2].Value = ordersReader["user_email"];
-                                                        worksheet.Cells[orderRow, 3].Value = Convert.ToDateTime(ordersReader["order_date"]).ToString("yyyy-MM-dd");
-                                                        worksheet.Cells[orderRow, 4].Value = ((TimeSpan)ordersReader["order_time"]).ToString(@"hh\:mm\:ss");
+
+                                                        // Форматируем дату
+                                                        DateTime orderDate = Convert.ToDateTime(ordersReader["order_date"]);
+                                                        worksheet.Cells[orderRow, 3].Value = orderDate.ToString("yyyy-MM-dd"); // Только дата
+
+                                                        // Форматируем время
+                                                        TimeSpan orderTime = (TimeSpan)ordersReader["order_time"];
+                                                        worksheet.Cells[orderRow, 4].Value = orderTime.ToString(@"hh\:mm\:ss"); // Только время
+
                                                         worksheet.Cells[orderRow, 5].Value = ordersReader["total_price"];
                                                         worksheet.Cells[orderRow, 6].Value = ordersReader["quantity"];
                                                         worksheet.Cells[orderRow, 7].Value = ordersReader["points_spent"];
                                                         worksheet.Cells[orderRow, 8].Value = ordersReader["assortment_name"];
                                                         worksheet.Cells[orderRow, 9].Value = ordersReader["size_name"];
-                                                        worksheet.Cells[orderRow, 10].Value = ordersReader["syrup_name"];
+                                                        worksheet.Cells[orderRow, 10].Value = ordersReader["syrup_names"];
                                                         worksheet.Cells[orderRow, 11].Value = ordersReader["price"];
                                                         worksheet.Cells[orderRow, 12].Value = ordersReader["status"];
+                                                        worksheet.Cells[orderRow, 3].Style.Numberformat.Format = "yyyy-MM-dd";
+                                                        worksheet.Cells[orderRow, 4].Style.Numberformat.Format = "hh:mm:ss";
                                                         orderRow++;
                                                     }
-
                                                 }
-                                            }                                            
-
-
+                                            }
                                             // Сохранение Excel файла
                                             package.SaveAs(new FileInfo(saveFileDialog.FileName));
                                         }
                                     }
                                 }
+                                MessageBox.Show("Отчет успешно сохранен!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             }
-
-                            MessageBox.Show("Отчет успешно сохранен!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                     }
                     else
@@ -721,6 +663,7 @@ namespace кофейня
                 }
             }
         }
+
         private void textBox4_Leave(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(textBox4.Text))
@@ -764,6 +707,163 @@ namespace кофейня
             {
                 textBox5.Clear();
             }
+        }
+
+        private void LoadAllSyrups()
+        {
+            try
+            {
+                using (var connection = new NpgsqlConnection(ConnectionString))
+                {
+                    connection.Open();
+                    var query = "SELECT id, name, price FROM Syrups";
+                    var adapter = new NpgsqlDataAdapter(query, connection);
+                    var syrupTable = new DataTable();
+                    adapter.Fill(syrupTable);
+                    dataGridView2.DataSource = syrupTable;
+
+                    // Настройка ширины столбцов
+                    dataGridView2.Columns["id"].Width = 50;
+                    dataGridView2.Columns["name"].Width = 200;
+                    dataGridView2.Columns["price"].Width = 97;
+
+                    // Скрыть первый столбец (ID)
+                    dataGridView2.Columns[0].Visible = false;
+                    dataGridView2.ReadOnly = true; // Запретить редактирование
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки сиропов: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void button13_Click(object sender, EventArgs e)
+        {
+            using (var form = new syrups())
+            {
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        // Добавление нового сиропа в базу данных
+                        using (var connection = new NpgsqlConnection(ConnectionString))
+                        {
+                            connection.Open();
+                            var insertCommand = new NpgsqlCommand(
+                                "INSERT INTO Syrups (name, price) VALUES (@Name, @Price)", connection);
+                            insertCommand.Parameters.AddWithValue("@Name", form.SyrupName);
+                            insertCommand.Parameters.AddWithValue("@Price", form.SyrupPrice);
+                            insertCommand.ExecuteNonQuery();
+                        }
+
+                        MessageBox.Show("Сироп успешно добавлен.", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        LoadAllSyrups(); // Обновляем список сиропов
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Ошибка добавления сиропа: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+        }
+
+        private void button14_Click(object sender, EventArgs e)
+        {
+            if (dataGridView2.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Выберите сироп для изменения.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            int selectedSyrupId = Convert.ToInt32(dataGridView2.SelectedRows[0].Cells["id"].Value);
+            string currentName = dataGridView2.SelectedRows[0].Cells["name"].Value.ToString();
+            decimal currentPrice = Convert.ToDecimal(dataGridView2.SelectedRows[0].Cells["price"].Value);
+
+            using (var form = new syrups(currentName, currentPrice))
+            {
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        // Обновление данных сиропа в базе данных
+                        using (var connection = new NpgsqlConnection(ConnectionString))
+                        {
+                            connection.Open();
+                            var updateCommand = new NpgsqlCommand(
+                                "UPDATE Syrups SET name = @Name, price = @Price WHERE id = @Id", connection);
+                            updateCommand.Parameters.AddWithValue("@Name", form.SyrupName);
+                            updateCommand.Parameters.AddWithValue("@Price", form.SyrupPrice);
+                            updateCommand.Parameters.AddWithValue("@Id", selectedSyrupId);
+                            updateCommand.ExecuteNonQuery();
+                        }
+
+                        MessageBox.Show("Сироп успешно изменен.", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        LoadAllSyrups(); // Обновляем список сиропов
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Ошибка изменения сиропа: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+        }
+        private void button12_Click(object sender, EventArgs e)
+        {
+            if (dataGridView2.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Выберите сироп для удаления.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            int selectedSyrupId = Convert.ToInt32(dataGridView2.SelectedRows[0].Cells["id"].Value);
+
+            try
+            {
+                using (var connection = new NpgsqlConnection(ConnectionString))
+                {
+                    connection.Open();
+                    using (var transaction = connection.BeginTransaction())
+                    {
+                        try
+                        {
+                            // Удаление связей
+                            var deleteRelationsQuery = "DELETE FROM Assortment_Syrups WHERE syrup_id = @SyrupId";
+                            using (var deleteRelationsCommand = new NpgsqlCommand(deleteRelationsQuery, connection))
+                            {
+                                deleteRelationsCommand.Parameters.AddWithValue("@SyrupId", selectedSyrupId);
+                                deleteRelationsCommand.ExecuteNonQuery();
+                            }
+
+                            // Удаление сиропа
+                            var deleteSyrupQuery = "DELETE FROM Syrups WHERE id = @SyrupId";
+                            using (var deleteSyrupCommand = new NpgsqlCommand(deleteSyrupQuery, connection))
+                            {
+                                deleteSyrupCommand.Parameters.AddWithValue("@SyrupId", selectedSyrupId);
+                                deleteSyrupCommand.ExecuteNonQuery();
+                            }
+
+                            transaction.Commit();
+                            MessageBox.Show("Сироп успешно удален.", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            LoadAllSyrups(); // Обновление списка сиропов
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            MessageBox.Show($"Ошибка удаления сиропа: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка удаления сиропа: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void admin_menu_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

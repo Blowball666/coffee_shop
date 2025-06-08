@@ -40,6 +40,7 @@
             button4 = new Button();
             pictureBox1 = new PictureBox();
             radioButton4 = new RadioButton();
+            button2 = new Button();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dataGridView2).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
@@ -75,9 +76,9 @@
             // 
             dataGridView1.BackgroundColor = Color.White;
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Location = new Point(742, 45);
+            dataGridView1.Location = new Point(20, 63);
             dataGridView1.Name = "dataGridView1";
-            dataGridView1.Size = new Size(581, 351);
+            dataGridView1.Size = new Size(503, 351);
             dataGridView1.TabIndex = 65;
             dataGridView1.SelectionChanged += dataGridView1_SelectionChanged;
             // 
@@ -85,9 +86,9 @@
             // 
             dataGridView2.BackgroundColor = Color.White;
             dataGridView2.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView2.Location = new Point(352, 45);
+            dataGridView2.Location = new Point(538, 63);
             dataGridView2.Name = "dataGridView2";
-            dataGridView2.Size = new Size(365, 351);
+            dataGridView2.Size = new Size(453, 351);
             dataGridView2.TabIndex = 67;
             // 
             // radioButton1
@@ -95,7 +96,7 @@
             radioButton1.AutoSize = true;
             radioButton1.Font = new Font("Roboto", 18F, FontStyle.Bold);
             radioButton1.ForeColor = Color.FromArgb(202, 57, 0);
-            radioButton1.Location = new Point(418, 461);
+            radioButton1.Location = new Point(25, 438);
             radioButton1.Name = "radioButton1";
             radioButton1.Size = new Size(175, 36);
             radioButton1.TabIndex = 72;
@@ -108,7 +109,7 @@
             radioButton2.AutoSize = true;
             radioButton2.Font = new Font("Roboto", 18F, FontStyle.Bold);
             radioButton2.ForeColor = Color.FromArgb(202, 57, 0);
-            radioButton2.Location = new Point(418, 502);
+            radioButton2.Location = new Point(25, 479);
             radioButton2.Name = "radioButton2";
             radioButton2.Size = new Size(310, 36);
             radioButton2.TabIndex = 73;
@@ -121,7 +122,7 @@
             radioButton3.AutoSize = true;
             radioButton3.Font = new Font("Roboto", 18F, FontStyle.Bold);
             radioButton3.ForeColor = Color.FromArgb(202, 57, 0);
-            radioButton3.Location = new Point(418, 419);
+            radioButton3.Location = new Point(25, 521);
             radioButton3.Name = "radioButton3";
             radioButton3.Size = new Size(133, 36);
             radioButton3.TabIndex = 74;
@@ -136,7 +137,7 @@
             button3.FlatStyle = FlatStyle.Flat;
             button3.ForeColor = Color.Transparent;
             button3.Image = (Image)resources.GetObject("button3.Image");
-            button3.Location = new Point(958, 432);
+            button3.Location = new Point(626, 420);
             button3.Name = "button3";
             button3.Size = new Size(365, 74);
             button3.TabIndex = 75;
@@ -150,7 +151,7 @@
             button4.FlatStyle = FlatStyle.Flat;
             button4.ForeColor = Color.Transparent;
             button4.Image = (Image)resources.GetObject("button4.Image");
-            button4.Location = new Point(958, 512);
+            button4.Location = new Point(626, 500);
             button4.Name = "button4";
             button4.Size = new Size(365, 74);
             button4.TabIndex = 76;
@@ -161,7 +162,7 @@
             // 
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
             pictureBox1.InitialImage = null;
-            pictureBox1.Location = new Point(1, 124);
+            pictureBox1.Location = new Point(997, 122);
             pictureBox1.Name = "pictureBox1";
             pictureBox1.Size = new Size(350, 350);
             pictureBox1.TabIndex = 79;
@@ -173,7 +174,7 @@
             radioButton4.Checked = true;
             radioButton4.Font = new Font("Roboto", 18F, FontStyle.Bold);
             radioButton4.ForeColor = Color.FromArgb(202, 57, 0);
-            radioButton4.Location = new Point(418, 544);
+            radioButton4.Location = new Point(25, 563);
             radioButton4.Name = "radioButton4";
             radioButton4.Size = new Size(72, 36);
             radioButton4.TabIndex = 80;
@@ -182,12 +183,26 @@
             radioButton4.UseVisualStyleBackColor = true;
             radioButton4.CheckedChanged += radioButton_CheckedChanged;
             // 
+            // button2
+            // 
+            button2.BackColor = Color.Transparent;
+            button2.BackgroundImageLayout = ImageLayout.None;
+            button2.FlatStyle = FlatStyle.Flat;
+            button2.ForeColor = Color.Transparent;
+            button2.Image = (Image)resources.GetObject("button2.Image");
+            button2.Location = new Point(553, 506);
+            button2.Name = "button2";
+            button2.Size = new Size(67, 62);
+            button2.TabIndex = 81;
+            button2.UseVisualStyleBackColor = false;
+            // 
             // barista_zakaz
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
             ClientSize = new Size(1350, 621);
+            Controls.Add(button2);
             Controls.Add(radioButton4);
             Controls.Add(pictureBox1);
             Controls.Add(button4);
@@ -223,5 +238,6 @@
         private Button button4;
         private PictureBox pictureBox1;
         private RadioButton radioButton4;
+        private Button button2;
     }
 }

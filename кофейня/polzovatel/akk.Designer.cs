@@ -35,7 +35,6 @@
             label2 = new Label();
             label3 = new Label();
             label5 = new Label();
-            label7 = new Label();
             label6 = new Label();
             button1 = new Button();
             label8 = new Label();
@@ -44,6 +43,9 @@
             label11 = new Label();
             label12 = new Label();
             pictureBox2 = new PictureBox();
+            button2 = new Button();
+            button4 = new Button();
+            button5 = new Button();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
             SuspendLayout();
             // 
@@ -55,9 +57,9 @@
             label1.ForeColor = Color.FromArgb(202, 57, 0);
             label1.Location = new Point(86, 26);
             label1.Name = "label1";
-            label1.Size = new Size(143, 43);
+            label1.Size = new Size(162, 43);
             label1.TabIndex = 30;
-            label1.Text = "Аккаунт";
+            label1.Text = "АККАУНТ";
             // 
             // button3
             // 
@@ -79,7 +81,7 @@
             label4.BackColor = Color.Transparent;
             label4.Font = new Font("Roboto", 20F);
             label4.ForeColor = Color.FromArgb(202, 57, 0);
-            label4.Location = new Point(118, 265);
+            label4.Location = new Point(137, 297);
             label4.Name = "label4";
             label4.Size = new Size(131, 35);
             label4.TabIndex = 41;
@@ -91,7 +93,7 @@
             label2.BackColor = Color.Transparent;
             label2.Font = new Font("Roboto", 20F);
             label2.ForeColor = Color.FromArgb(202, 57, 0);
-            label2.Location = new Point(118, 105);
+            label2.Location = new Point(137, 137);
             label2.Name = "label2";
             label2.Size = new Size(199, 35);
             label2.TabIndex = 40;
@@ -103,7 +105,7 @@
             label3.BackColor = Color.Transparent;
             label3.Font = new Font("Roboto", 20F);
             label3.ForeColor = Color.FromArgb(202, 57, 0);
-            label3.Location = new Point(118, 177);
+            label3.Location = new Point(137, 209);
             label3.Name = "label3";
             label3.Size = new Size(100, 35);
             label3.TabIndex = 39;
@@ -115,23 +117,11 @@
             label5.BackColor = Color.Transparent;
             label5.Font = new Font("Roboto", 20F);
             label5.ForeColor = Color.FromArgb(202, 57, 0);
-            label5.Location = new Point(115, 347);
+            label5.Location = new Point(134, 379);
             label5.Name = "label5";
             label5.Size = new Size(219, 35);
             label5.TabIndex = 42;
             label5.Text = "Дата рождения:";
-            // 
-            // label7
-            // 
-            label7.AutoSize = true;
-            label7.BackColor = Color.Transparent;
-            label7.Font = new Font("Roboto", 20.25F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            label7.ForeColor = Color.FromArgb(202, 57, 0);
-            label7.Location = new Point(459, 26);
-            label7.Name = "label7";
-            label7.Size = new Size(99, 35);
-            label7.TabIndex = 43;
-            label7.Text = "роль...";
             // 
             // label6
             // 
@@ -139,7 +129,7 @@
             label6.BackColor = Color.Transparent;
             label6.Font = new Font("Roboto", 20F);
             label6.ForeColor = Color.FromArgb(202, 57, 0);
-            label6.Location = new Point(115, 424);
+            label6.Location = new Point(134, 456);
             label6.Name = "label6";
             label6.Size = new Size(203, 35);
             label6.TabIndex = 44;
@@ -152,9 +142,9 @@
             button1.FlatStyle = FlatStyle.Flat;
             button1.ForeColor = Color.Transparent;
             button1.Image = (Image)resources.GetObject("button1.Image");
-            button1.Location = new Point(115, 503);
+            button1.Location = new Point(564, 21);
             button1.Name = "button1";
-            button1.Size = new Size(476, 69);
+            button1.Size = new Size(53, 51);
             button1.TabIndex = 45;
             button1.UseVisualStyleBackColor = false;
             button1.Click += button1_Click;
@@ -165,7 +155,7 @@
             label8.BackColor = Color.Transparent;
             label8.Font = new Font("Roboto", 20F);
             label8.ForeColor = Color.FromArgb(202, 57, 0);
-            label8.Location = new Point(325, 105);
+            label8.Location = new Point(344, 137);
             label8.Name = "label8";
             label8.Size = new Size(36, 35);
             label8.TabIndex = 50;
@@ -177,7 +167,7 @@
             label9.BackColor = Color.Transparent;
             label9.Font = new Font("Roboto", 20F);
             label9.ForeColor = Color.FromArgb(202, 57, 0);
-            label9.Location = new Point(224, 177);
+            label9.Location = new Point(243, 209);
             label9.Name = "label9";
             label9.Size = new Size(36, 35);
             label9.TabIndex = 49;
@@ -189,7 +179,7 @@
             label10.BackColor = Color.Transparent;
             label10.Font = new Font("Roboto", 20F);
             label10.ForeColor = Color.FromArgb(202, 57, 0);
-            label10.Location = new Point(251, 265);
+            label10.Location = new Point(270, 297);
             label10.Name = "label10";
             label10.Size = new Size(36, 35);
             label10.TabIndex = 48;
@@ -201,7 +191,7 @@
             label11.BackColor = Color.Transparent;
             label11.Font = new Font("Roboto", 20F);
             label11.ForeColor = Color.FromArgb(202, 57, 0);
-            label11.Location = new Point(340, 347);
+            label11.Location = new Point(359, 379);
             label11.Name = "label11";
             label11.Size = new Size(36, 35);
             label11.TabIndex = 47;
@@ -213,7 +203,7 @@
             label12.BackColor = Color.Transparent;
             label12.Font = new Font("Roboto", 20F);
             label12.ForeColor = Color.FromArgb(202, 57, 0);
-            label12.Location = new Point(324, 424);
+            label12.Location = new Point(343, 456);
             label12.Name = "label12";
             label12.Size = new Size(36, 35);
             label12.TabIndex = 46;
@@ -228,12 +218,57 @@
             pictureBox2.TabIndex = 51;
             pictureBox2.TabStop = false;
             // 
+            // button2
+            // 
+            button2.BackColor = Color.Transparent;
+            button2.BackgroundImageLayout = ImageLayout.None;
+            button2.FlatStyle = FlatStyle.Flat;
+            button2.ForeColor = Color.Transparent;
+            button2.Image = (Image)resources.GetObject("button2.Image");
+            button2.Location = new Point(446, 18);
+            button2.Name = "button2";
+            button2.Size = new Size(53, 51);
+            button2.TabIndex = 52;
+            button2.UseVisualStyleBackColor = false;
+            button2.Click += button2_Click;
+            // 
+            // button4
+            // 
+            button4.BackColor = Color.Transparent;
+            button4.BackgroundImageLayout = ImageLayout.None;
+            button4.FlatStyle = FlatStyle.Flat;
+            button4.ForeColor = Color.Transparent;
+            button4.Image = (Image)resources.GetObject("button4.Image");
+            button4.Location = new Point(623, 19);
+            button4.Name = "button4";
+            button4.Size = new Size(53, 51);
+            button4.TabIndex = 53;
+            button4.UseVisualStyleBackColor = false;
+            button4.Click += button4_Click;
+            // 
+            // button5
+            // 
+            button5.BackColor = Color.Transparent;
+            button5.BackgroundImageLayout = ImageLayout.None;
+            button5.FlatStyle = FlatStyle.Flat;
+            button5.ForeColor = Color.Transparent;
+            button5.Image = (Image)resources.GetObject("button5.Image");
+            button5.Location = new Point(505, 18);
+            button5.Name = "button5";
+            button5.Size = new Size(53, 51);
+            button5.TabIndex = 54;
+            button5.UseVisualStyleBackColor = false;
+            button5.Click += button5_Click;
+            // 
             // akk
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
             ClientSize = new Size(1350, 621);
+            Controls.Add(button5);
+            Controls.Add(button4);
+            Controls.Add(button2);
             Controls.Add(pictureBox2);
             Controls.Add(label8);
             Controls.Add(label9);
@@ -242,7 +277,6 @@
             Controls.Add(label12);
             Controls.Add(button1);
             Controls.Add(label6);
-            Controls.Add(label7);
             Controls.Add(label5);
             Controls.Add(label4);
             Controls.Add(label2);
@@ -267,7 +301,6 @@
         private Label label2;
         private Label label3;
         private Label label5;
-        private Label label7;
         private Label label6;
         private Button button1;
         private Label label8;
@@ -276,5 +309,8 @@
         private Label label11;
         private Label label12;
         private PictureBox pictureBox2;
+        private Button button2;
+        private Button button4;
+        private Button button5;
     }
 }

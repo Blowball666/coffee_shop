@@ -47,9 +47,9 @@
             label3.ForeColor = Color.FromArgb(202, 57, 0);
             label3.Location = new Point(86, 26);
             label3.Name = "label3";
-            label3.Size = new Size(209, 43);
+            label3.Size = new Size(240, 43);
             label3.TabIndex = 32;
-            label3.Text = "Отложенное";
+            label3.Text = "ОТЛОЖЕННОЕ";
             // 
             // button3
             // 
@@ -142,6 +142,7 @@
             MinimumSize = new Size(1364, 660);
             Name = "otl";
             Text = "Кофейня";
+            FormClosing += otl_FormClosing;
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
             ResumeLayout(false);

@@ -12,10 +12,10 @@ namespace кофейня.polzovatel
 {
     public partial class otl : Form
     {
+        private static info currentInfoFormOtl = null; // Текущая форма info
         private int userId;
-        private int userRoleId = 2;
-        private DataTable assortmentData;
-        private vkladki vkladkiForm;
+        private vkladki vkladkiForm; // Форма навигации
+        private DataTable wishlistData; // Данные для DataGridView
         private Dictionary<int, Image> imageCache = new(); // Кэш изображений
 
         public otl(int userId)
@@ -24,59 +24,58 @@ namespace кофейня.polzovatel
             this.userId = userId;
             this.StartPosition = FormStartPosition.Manual;
             this.Location = new Point(0, 0);
-
-            assortmentData = new DataTable();
-            LoadDataAsync();
+            wishlistData = new DataTable();
+            _ = LoadDataAsync().ContinueWith(task =>
+            {
+                if (task.IsFaulted)
+                {
+                    MessageBox.Show("Ошибка при загрузке данных.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         // Метод для создания подключения к базе данных
         private NpgsqlConnection CreateConnection()
         {
-            return new NpgsqlConnection("Host=172.20.7.6;Database=krezhowa_coffee;Username=st;Password=pwd");
-        }       
+            return new NpgsqlConnection("Host=localhost;Database=coffee_db;Username=postgres;Password=pwd");
+        }
+
         // Метод загрузки данных из базы данных
         private async Task LoadDataAsync()
         {
             string query = @"
-            SELECT 
-                wi.assortment_id AS id,
-                a.name,
-                a.price,
-                a.photo
-            FROM 
-                Wishlist_Items wi
-            JOIN         
-                Wishlist w ON wi.wishlist_id = w.id
-            JOIN         
-                Assortment a ON wi.assortment_id = a.id
-            WHERE 
-                w.user_id = @userId";
-
+                SELECT 
+                    w.assortment_id AS id,
+                    a.name,
+                    a.price,
+                    a.photo
+                FROM 
+                    Wishlist w
+                JOIN 
+                    Assortment a ON w.assortment_id = a.id
+                WHERE 
+                    w.user_id = @userId";
             using (var conn = CreateConnection())
             using (var adapter = new NpgsqlDataAdapter(query, conn))
             {
                 adapter.SelectCommand.Parameters.AddWithValue("@userId", userId);
                 var dataTable = new DataTable();
-
                 await Task.Run(() => adapter.Fill(dataTable)); // Асинхронная загрузка
-
-                assortmentData.Clear();
-                assortmentData.Merge(dataTable);
-
-                label2.Text = $"{assortmentData.Rows.Count}";
+                wishlistData.Clear();
+                wishlistData.Merge(dataTable);
+                label2.Text = $"{wishlistData.Rows.Count}";
                 SetupDataGridView();
             }
         }
+
         // Настройка DataGridView
         private void SetupDataGridView()
         {
-            dataGridView1.DataSource = assortmentData;
-
+            dataGridView1.DataSource = wishlistData;
             dataGridView1.Columns["name"].Width = 180;
             dataGridView1.Columns["price"].Width = 120;
             dataGridView1.Columns["photo"].Width = 200;
             dataGridView1.RowTemplate.Height = 200;
-
             dataGridView1.Columns["photo"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             dataGridView1.Columns["photo"].DefaultCellStyle.Padding = new Padding(5);
             dataGridView1.Columns["id"].Visible = false;
@@ -94,13 +93,12 @@ namespace кофейня.polzovatel
 
             dataGridView1.DefaultCellStyle.SelectionBackColor = Color.White;
             dataGridView1.DefaultCellStyle.SelectionForeColor = Color.Black;
-
             Font robotoFont = new Font("Roboto", 16, FontStyle.Bold);
             dataGridView1.DefaultCellStyle.Font = robotoFont;
-
             dataGridView1.CellFormatting += DataGridView1_CellFormatting;
             LoadProductImagesAsync(); // Загрузка изображений
         }
+
         private void DataGridView1_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
             if (e.RowIndex < 0 || e.RowIndex >= dataGridView1.Rows.Count || dataGridView1.Rows[e.RowIndex].Cells["id"].Value == null)
@@ -121,109 +119,103 @@ namespace кофейня.polzovatel
                 e.Value = GetWishlistImage(assortmentId);
             }
         }
+
         private void DataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex >= 0 && e.ColumnIndex == dataGridView1.Columns["addToWishlist"].Index)
             {
                 int assortmentId = (int)dataGridView1.Rows[e.RowIndex].Cells["id"].Value;
-                int wishlistId = GetOrCreateWishlistId();
-
-                if (IsItemInWishlist(wishlistId, assortmentId))
+                if (IsItemInWishlist(userId, assortmentId))
                 {
-                    RemoveFromWishlist(wishlistId, assortmentId);
-                    // Удаляем строку из DataTable
-                    var rowToDelete = assortmentData.AsEnumerable().FirstOrDefault(row => (int)row["id"] == assortmentId);
+                    RemoveFromWishlist(userId, assortmentId);
+                    var rowToDelete = wishlistData.AsEnumerable().FirstOrDefault(row => (int)row["id"] == assortmentId);
                     if (rowToDelete != null)
                     {
-                        assortmentData.Rows.Remove(rowToDelete);
+                        wishlistData.Rows.Remove(rowToDelete);
                     }
                 }
                 else
                 {
-                    AddToWishlist(wishlistId, assortmentId);
+                    AddToWishlist(userId, assortmentId);
                 }
             }
         }
+
         private Image ResizeImage(Image image, int width, int height)
         {
             float ratioX = (float)width / image.Width;
             float ratioY = (float)height / image.Height;
-            float ratio = Math.Min(ratioX, ratioY); // Выбираем наименьшее соотношение для пропорционального масштабирования
-
+            float ratio = Math.Min(ratioX, ratioY);
             int newWidth = (int)(image.Width * ratio);
             int newHeight = (int)(image.Height * ratio);
 
-            Bitmap resizedImage = new Bitmap(newWidth, newHeight);
-            using (Graphics g = Graphics.FromImage(resizedImage))
+            using (var resizedImage = new Bitmap(newWidth, newHeight))
             {
-                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                g.DrawImage(image, 0, 0, newWidth, newHeight);
+                using (Graphics g = Graphics.FromImage(resizedImage))
+                {
+                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                    g.DrawImage(image, 0, 0, newWidth, newHeight);
+                }
+                return new Bitmap(resizedImage); // Создаем новый объект для возврата
             }
-
-            return resizedImage;
         }
+
         private Image GetWishlistImage(int assortmentId)
         {
             string imagesFolderPath = Path.Combine(Application.StartupPath, "Resources", "значки");
-            string imagePath = IsItemInWishlist(GetOrCreateWishlistId(), assortmentId)
+            string imagePath = IsItemInWishlist(userId, assortmentId)
                 ? Path.Combine(imagesFolderPath, "сердце.png")
                 : Path.Combine(imagesFolderPath, "пуст_сердце.png");
-
             return Image.FromFile(imagePath);
         }
-        private int GetOrCreateWishlistId()
+
+        private bool IsItemInWishlist(int userId, int assortmentId)
         {
-            int wishlistId = ExecuteScalarQuery("SELECT id FROM Wishlist WHERE user_id = @userId", new NpgsqlParameter("@userId", userId));
-            if (wishlistId == 0)
+            string query = "SELECT COUNT(*) FROM Wishlist WHERE user_id = @userId AND assortment_id = @assortmentId";
+            return ExecuteScalarQuery(query, new NpgsqlParameter("@userId", userId), new NpgsqlParameter("@assortmentId", assortmentId)) > 0;
+        }
+
+        private void AddToWishlist(int userId, int assortmentId)
+        {
+            string query = "INSERT INTO Wishlist (user_id, assortment_id) VALUES (@userId, @assortmentId)";
+            ExecuteNonQuery(query, new NpgsqlParameter("@userId", userId), new NpgsqlParameter("@assortmentId", assortmentId));
+            UpdateWishlistCount(userId);
+        }
+
+        private void RemoveFromWishlist(int userId, int assortmentId)
+        {
+            string query = "DELETE FROM Wishlist WHERE user_id = @userId AND assortment_id = @assortmentId";
+            ExecuteNonQuery(query, new NpgsqlParameter("@userId", userId), new NpgsqlParameter("@assortmentId", assortmentId));
+            UpdateWishlistCount(userId);
+        }
+
+        private void UpdateWishlistCount(int userId)
+        {
+            string query = "SELECT COUNT(*) FROM Wishlist WHERE user_id = @userId";
+            int itemCount = ExecuteScalarQuery(query, new NpgsqlParameter("@userId", userId));
+            label2.Text = $"{itemCount}";
+        }
+
+        private void ExecuteNonQuery(string query, params NpgsqlParameter[] parameters)
+        {
+            try
             {
                 using (var conn = CreateConnection())
                 {
                     conn.Open();
-                    using (var cmd = new NpgsqlCommand("INSERT INTO Wishlist (user_id) VALUES (@userId) RETURNING id", conn))
+                    using (var cmd = new NpgsqlCommand(query, conn))
                     {
-                        cmd.Parameters.AddWithValue("@userId", userId);
-                        wishlistId = (int)cmd.ExecuteScalar();
+                        cmd.Parameters.AddRange(parameters);
+                        cmd.ExecuteNonQuery();
                     }
                 }
             }
-            return wishlistId;
-        }
-        private bool IsItemInWishlist(int wishlistId, int assortmentId)
-        {
-            string query = "SELECT COUNT(*) FROM Wishlist_Items WHERE wishlist_id = @wishlistId AND assortment_id = @assortmentId";
-            return ExecuteScalarQuery(query, new NpgsqlParameter("@wishlistId", wishlistId), new NpgsqlParameter("@assortmentId", assortmentId)) > 0;
-        }
-        private void AddToWishlist(int wishlistId, int assortmentId)
-        {
-            string query = "INSERT INTO Wishlist_Items (wishlist_id, assortment_id) VALUES (@wishlistId, @assortmentId)";
-            ExecuteNonQuery(query, new NpgsqlParameter("@wishlistId", wishlistId), new NpgsqlParameter("@assortmentId", assortmentId));
-            UpdateWishlistCount(wishlistId);
-        }
-        private void RemoveFromWishlist(int wishlistId, int assortmentId)
-        {
-            string query = "DELETE FROM Wishlist_Items WHERE wishlist_id = @wishlistId AND assortment_id = @assortmentId";
-            ExecuteNonQuery(query, new NpgsqlParameter("@wishlistId", wishlistId), new NpgsqlParameter("@assortmentId", assortmentId));
-            UpdateWishlistCount(wishlistId);
-        }
-        private void UpdateWishlistCount(int wishlistId)
-        {
-            string query = "SELECT COUNT(*) FROM Wishlist_Items WHERE wishlist_id = @wishlistId";
-            int itemCount = ExecuteScalarQuery(query, new NpgsqlParameter("@wishlistId", wishlistId));
-
-            label2.Text = $"{itemCount}";
-        }
-        private void ExecuteNonQuery(string query, params NpgsqlParameter[] parameters)
-        {
-            using (var conn = CreateConnection())
+            catch (Exception ex)
             {
-                conn.Open();
-                using (var cmd = new NpgsqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddRange(parameters);
-                    cmd.ExecuteNonQuery();
-                }
+                MessageBox.Show($"Ошибка при выполнении запроса: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
         private int ExecuteScalarQuery(string query, params NpgsqlParameter[] parameters)
         {
             using (var conn = CreateConnection())
@@ -237,111 +229,113 @@ namespace кофейня.polzovatel
                 }
             }
         }
+
         private void DataGridView1_DataError(object sender, DataGridViewDataErrorEventArgs e)
         {
-            // Логирование ошибки
             Console.WriteLine($"Ошибка в строке {e.RowIndex}, колонке {e.ColumnIndex}: {e.Exception.Message}");
-            e.ThrowException = false; // Подавить исключение
+            e.ThrowException = false;
         }
+
         private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex >= 0)
+            if (e.RowIndex >= 0 && (currentInfoFormOtl == null || currentInfoFormOtl.IsDisposed))
             {
                 int assortmentId = (int)dataGridView1.Rows[e.RowIndex].Cells["id"].Value;
-                OpenProductInfoForm(assortmentId);
+                currentInfoFormOtl = new info(assortmentId, userId, 2, this);
+                currentInfoFormOtl.Show();
+                currentInfoFormOtl.FormClosing += async (s, args) =>
+                {
+                    await UpdateDataGridViewAsync();
+                    UpdateWishlistCount(userId);
+                    currentInfoFormOtl = null;
+                };
+            }
+            else if (currentInfoFormOtl != null && !currentInfoFormOtl.IsDisposed)
+            {
+                currentInfoFormOtl.Focus(); // Переводим фокус на уже открытую форму
             }
         }
-        // Открытие формы с информацией о продукте
-        private void OpenProductInfoForm(int assortmentId)
-        {
-            var productInfoForm = new info(assortmentId, userId, userRoleId, this);
-            productInfoForm.FormClosing += async (s, args) =>
-            {
-                await UpdateDataGridViewAsync();
-                UpdateWishlistCount(GetOrCreateWishlistId());
-            };
-            productInfoForm.Show();
-        }
+
         private async Task UpdateDataGridViewAsync()
         {
-            var currentIds = assortmentData.AsEnumerable().Select(row => row.Field<int>("id")).ToHashSet();
+            ClearImageCache(); // Очищаем кэш перед обновлением данных
+            var currentIds = wishlistData.AsEnumerable().Select(row => row.Field<int>("id")).ToHashSet();
             string query = @"
         SELECT 
-            wi.assortment_id AS id,
+            w.assortment_id AS id,
             a.name,
             a.price,
             a.photo
         FROM 
-            Wishlist_Items wi
+            Wishlist w
         JOIN 
-            Wishlist w ON wi.wishlist_id = w.id
-        JOIN 
-            Assortment a ON wi.assortment_id = a.id
+            Assortment a ON w.assortment_id = a.id
         WHERE 
             w.user_id = @userId";
-
             using (var conn = CreateConnection())
             using (var adapter = new NpgsqlDataAdapter(query, conn))
             {
                 adapter.SelectCommand.Parameters.AddWithValue("@userId", userId);
                 var newData = new DataTable();
                 await Task.Run(() => adapter.Fill(newData));
-
                 var idsToRemove = currentIds.Except(newData.AsEnumerable().Select(row => row.Field<int>("id"))).ToList();
-
                 foreach (var id in idsToRemove)
                 {
-                    var rowToDelete = assortmentData.AsEnumerable().FirstOrDefault(r => r.Field<int>("id") == id);
+                    var rowToDelete = wishlistData.AsEnumerable().FirstOrDefault(r => r.Field<int>("id") == id);
                     if (rowToDelete != null)
                     {
-                        assortmentData.Rows.Remove(rowToDelete);
+                        wishlistData.Rows.Remove(rowToDelete);
                     }
                 }
-
-                assortmentData.AcceptChanges();
-                // Обновление только видимых строк
+                wishlistData.AcceptChanges();
                 dataGridView1.Invalidate();
             }
         }
+
         private void LoadImageForRow(DataGridViewRow row, int assortmentId, byte[] imageData)
         {
             if (imageData == null || imageData.Length == 0)
                 return;
 
             Image img;
-            // Проверяем наличие изображения в кеше
             if (imageCache.TryGetValue(assortmentId, out img))
             {
                 row.Cells["photo"].Value = img;
-                return; // Если изображение найдено в кеше, сразу выводим его
+                return;
             }
 
-            // Если изображения нет в кеше, загружаем и сохраняем в кэш
             using (var ms = new MemoryStream(imageData))
             {
-                img = Image.FromStream(ms);
+                try
+                {
+                    img = Image.FromStream(ms);
+                }
+                catch (ArgumentException)
+                {
+                    img = null; // Или используйте запасное изображение
+                }
                 img = ResizeImage(img, dataGridView1.Columns["photo"].Width - 10, dataGridView1.RowTemplate.Height - 10);
-                imageCache[assortmentId] = img; // Сохраняем в кэш
+                imageCache[assortmentId] = img;
                 row.Cells["photo"].Value = img;
             }
         }
+
         private async Task LoadProductImagesAsync()
         {
-            // Создаем массив задач для асинхронной загрузки изображений
             var imageTasks = dataGridView1.Rows.Cast<DataGridViewRow>()
                 .Where(row => row.Cells["photo"].Value is byte[])
                 .Select(row =>
                 {
                     int assortmentId = (int)row.Cells["id"].Value;
                     byte[] imageData = (byte[])row.Cells["photo"].Value;
-                    return Task.Run(() => LoadImageForRow(row, assortmentId, imageData)); // Асинхронная загрузка
+                    return Task.Run(() => LoadImageForRow(row, assortmentId, imageData));
                 }).ToArray();
-
-            // Ожидаем завершения всех задач
             await Task.WhenAll(imageTasks);
         }
+
         private void button3_Click(object sender, EventArgs e)
         {
+            // Открываем форму vkladki
             if (vkladkiForm == null || vkladkiForm.IsDisposed)
             {
                 vkladkiForm = new vkladki(userId, this);
@@ -349,14 +343,29 @@ namespace кофейня.polzovatel
             }
             else
             {
-                ToggleFormVisibility(vkladkiForm);
+                vkladkiForm.Visible = !vkladkiForm.Visible;
+                if (vkladkiForm.Visible)
+                {
+                    vkladkiForm.Focus();
+                }
+            }
+            if (currentInfoFormOtl != null && !currentInfoFormOtl.IsDisposed)
+            {
+                currentInfoFormOtl.Close();
+                currentInfoFormOtl = null;
             }
         }
-        private void ToggleFormVisibility(Form form)
+        private void otl_FormClosing(object sender, FormClosingEventArgs e)
         {
-            form.Visible = !form.Visible;
-            if (form.Visible) form.Focus();
+            ClearImageCache();
         }
-
+        private void ClearImageCache()
+        {
+            foreach (var image in imageCache.Values)
+            {
+                image?.Dispose(); // Освобождаем ресурсы изображения
+            }
+            imageCache.Clear(); // Очищаем словарь
+        }
     }
 }

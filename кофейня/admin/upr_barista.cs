@@ -7,7 +7,7 @@ namespace кофейня.admin
 {
     public partial class upr_barista : Form
     {
-        private const string ConnectionString = "Host=172.20.7.6;Database=krezhowa_coffee;Username=st;Password=pwd";
+        private const string ConnectionString = "Host=localhost;Database=coffee_db;Username=postgres;Password=pwd";
         private vkladki_a vkladkiForm;
 
         public upr_barista()
